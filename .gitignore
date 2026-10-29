@@ -1,0 +1,13 @@
+node_modules
+dist
+.venv
+.env
+.env.*
+!.env.example
+.DS_Store
+.agents/
+.codex/
+.zcode/
+.playwright-mcp/
+.impeccable/
+MCP_SETUP.md
