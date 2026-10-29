@@ -3,9 +3,11 @@ import { ArrowDown, ArrowUpRight, Braces, Code2, MoveUpRight, Sprout } from 'luc
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PillNav from './components/PillNav';
 import OptionWheel from './components/OptionWheel';
+import StaggeredMenu from './components/StaggeredMenu';
+import AeroShards from './components/AeroShards';
+import ProfileCard from './components/ProfileCard';
 import HalftoneWordmarkFooter from './components/HalftoneWordmarkFooter';
 import SplitText from './components/SplitText';
-import Threads from './components/Threads';
 
 const navigation = [
   { label: 'Story', href: '#story' },
@@ -92,8 +94,16 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('#story');
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
   const [thread, setThread] = useState({ width: 0, height: 0, path: '' });
+  const [isMobileNav, setIsMobileNav] = useState(() => window.matchMedia('(max-width: 767px)').matches);
   const { scrollYProgress } = useScroll({ target: pageRef, offset: ['start start', 'end end'] });
   const activeProject = projects[activeProjectIndex];
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 767px)');
+    const onChange = event => setIsMobileNav(event.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
 
   useEffect(() => {
     const sections = ['#story', '#projects', '#experience']
@@ -142,17 +152,38 @@ export default function App() {
   return (
     <main className="portfolio-shell" ref={pageRef}>
       {thread.path && <svg className="portfolio-thread" viewBox={`0 0 ${thread.width} ${thread.height}`} preserveAspectRatio="none" aria-hidden="true"><path className="portfolio-thread-track" d={thread.path} /><motion.path className="portfolio-thread-progress" d={thread.path} style={{ pathLength: prefersReducedMotion ? 1 : scrollYProgress }} /></svg>}
+      {isMobileNav && (
+        <StaggeredMenu
+          isFixed
+          position="right"
+          displayItemNumbering={false}
+          items={[
+            { label: 'Story', link: '#story' },
+            { label: 'Projects', link: '#projects' },
+            { label: 'Experience', link: '#experience' }
+          ]}
+          cta={{ label: 'Say hello', link: 'mailto:nsshreeram@gmail.com', ariaLabel: 'Say hello — email Shreeram' }}
+          socialItems={[
+            { label: 'GitHub', link: 'https://github.com/TechRam09' },
+            { label: 'LinkedIn', link: 'https://www.linkedin.com/in/shreeram-ns/' }
+          ]}
+          colors={['#241d31', '#191620']}
+          accentColor="#fa8265"
+          menuButtonColor="#f0ece8"
+          openMenuButtonColor="#f0ece8"
+        />
+      )}
       <header className="site-header">
         <a className="wordmark" href="#story" aria-label="Shreeram N S, home">Shreeram <span>N S</span></a>
         <div className="header-navigation">
-          <PillNav ariaLabel="Portfolio" items={navigation} activeHref={activeSection} size="sm" surface="glass" theme="dark" itemStyle="text" hoverEffect="fill" indicator="dot" barColor="rgba(34, 25, 39, 0.48)" textColor="#E5DDE7" highlightColor="#FA8265" highlightTextColor="#1B111D" collapse="auto" />
+          <PillNav ariaLabel="Portfolio" items={navigation} activeHref={activeSection} size="sm" surface="glass" theme="dark" itemStyle="text" hoverEffect="fill" indicator="dot" barColor="rgba(34, 25, 39, 0.48)" textColor="#E5DDE7" highlightColor="#FA8265" highlightTextColor="#1B111D" collapse={isMobileNav ? 'always' : 'never'} />
         </div>
         <a className="header-contact" href="mailto:nsshreeram@gmail.com"><span>Say hello</span><ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} /></a>
       </header>
 
       <section className="hero" id="story" aria-labelledby="hero-title" data-thread-section>
         <div className="hero-shader" aria-hidden="true">
-          <Threads className="hero-threads" color={[0.62, 0.54, 0.92]} accentColor={[0.76, 0.67, 0.94]} amplitude={1.15} distance={0.3} enableMouseInteraction={!prefersReducedMotion} lineCount={58} thickness={0.52} softness={0.72} speed={0.32} waves={1.3} split={0.1} fray={0.38} angle={-9} parting={0.72} taper={0.58} brightness={1.18} fade={0.1} opacity={0.82} paused={prefersReducedMotion} />
+          <AeroShards shardColor="#ab9bf1" accentColor="#7f6fd1" markers="none" pulseOnClick={false} holdToGather={false} mouseStrength={0.4} paused={prefersReducedMotion} />
         </div>
         <div className="hero-shader-wash" aria-hidden="true" />
         <span className="hero-flow-anchor hero-flow-anchor-start" data-story-node aria-hidden="true" />
@@ -196,14 +227,16 @@ export default function App() {
             <div className="project-picker-wheel">
               <OptionWheel
                 items={projects.map(project => project.name)}
+                links={projects.map(project => project.href)}
                 defaultSelected={activeProjectIndex}
                 onChange={setActiveProjectIndex}
                 textColor="#9f91a4"
                 activeColor="#f0ece8"
-                fontSize={2}
+                fontSize={2.4}
                 spacing={1.75}
-                tilt={4}
-                inset={0}
+                tilt={16}
+                curve={1}
+                inset={18}
                 loop
               />
             </div>
@@ -242,6 +275,19 @@ export default function App() {
         <h2><span className="hero-title-line"><SplitText text="Need a website" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="or web app?" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2>
         <p>Tell me what you have in mind. We can talk through the design, development, scope, and next steps.</p>
         <a className="contact-cta" href="mailto:nsshreeram@gmail.com">Discuss a project <ArrowUpRight size={19} aria-hidden="true" /></a>
+        <div className="contact-profile">
+          <ProfileCard
+            avatarUrl="/portrait-cutout.png"
+            name="Shreeram N S"
+            title="Java Full-Stack Developer"
+            handle="TechRam09"
+            status="Online"
+            contactText="Say hello"
+            onContactClick={() => { window.location.href = 'mailto:nsshreeram@gmail.com'; }}
+            theme="dark"
+            backdropColor="#241d31"
+          />
+        </div>
       </footer>
 
       <HalftoneWordmarkFooter

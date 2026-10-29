@@ -37,6 +37,7 @@ const OptionWheel = ({
   draggable = true,
   soundUrl = '',
   soundVolume = 0.5,
+  links = [],
   className = ''
 }) => {
   const rootRef = useRef(null);
@@ -306,6 +307,18 @@ const OptionWheel = ({
           onClick={() => handleItemClick(index)}
         >
           {label}
+          {links[index] && selectedIndex === index && (
+            <a
+              href={links[index]}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${label} — open repository`}
+              onClick={event => event.stopPropagation()}
+              className="ow-arrow-link"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
+            </a>
+          )}
         </div>
       ))}
     </div>
