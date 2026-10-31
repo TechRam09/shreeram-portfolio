@@ -4,6 +4,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, animate } from 'framer-motion';
 import emailjs from '@emailjs/browser';
 import CurvedInput from './CurvedInput';
+import { validateContactForm } from '../lib/contact';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Mail01Icon } from '@hugeicons/core-free-icons';
 
@@ -453,11 +454,8 @@ const ProfileCard = ({
   const handleSubmit = async event => {
     event.preventDefault();
     if (sending) return;
-    setFormError('');
-    if (!form.name.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email) || !form.message.trim()) {
-      setFormError('Please add your name, a valid email, and a message.');
-      return;
-    }
+    setFormError(validateContactForm(form));
+    if (validateContactForm(form)) return;
     setSending(true);
     try {
       if (EMAILJS_READY) {

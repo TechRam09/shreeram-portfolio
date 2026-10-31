@@ -8,6 +8,7 @@ import AeroShards from './components/AeroShards';
 import PhysicsTagPile from './components/PhysicsTagPile';
 import ProfileCard from './components/ProfileCard';
 import HalftoneWordmarkFooter from './components/HalftoneWordmarkFooter';
+import { buildThreadPath, progressFractionAt } from './lib/thread';
 import SplitText from './components/SplitText';
 
 const navigation = [
@@ -46,22 +47,6 @@ const projects = [
 
 const skills = ['Java', 'Spring Boot', 'Spring', 'React', 'Tailwind CSS', 'SQL', 'Git', 'Python', 'JavaScript', 'C++', 'HTML', 'CSS', 'Flask', 'Bootstrap', 'AWS', 'Docker', 'Hibernate', 'WordPress', 'Analytical Thinking', 'Team Collaboration', 'Fast Learner', 'Time Management'];
 const featuredSkills = ['Spring', 'Spring Boot', 'Java', 'React', 'Tailwind CSS', 'SQL', 'Git'];
-
-function buildThreadPath(points) {
-  if (points.length < 2) return '';
-  const point = (x, y) => `${x.toFixed(1)} ${y.toFixed(1)}`;
-  let path = `M ${point(points[0].x, points[0].y)}`;
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const before = points[index - 1] || points[index];
-    const start = points[index];
-    const end = points[index + 1];
-    const after = points[index + 2] || end;
-    const controlOne = { x: start.x + (end.x - before.x) / 6, y: start.y + (end.y - before.y) / 6 };
-    const controlTwo = { x: end.x - (after.x - start.x) / 6, y: end.y - (after.y - start.y) / 6 };
-    path += ` C ${point(controlOne.x, controlOne.y)}, ${point(controlTwo.x, controlTwo.y)}, ${point(end.x, end.y)}`;
-  }
-  return path;
-}
 
 function ProjectArtwork({ visual }) {
   return (
@@ -157,18 +142,7 @@ export default function App() {
       // raw scroll fraction, which lags through the snaking curves.
       const target = window.scrollY + window.innerHeight * 0.55;
       const pts = arc.samples;
-      let frac = 1;
-      if (target <= pts[0].y) frac = 0;
-      else {
-        for (let i = 1; i < pts.length; i++) {
-          if (pts[i].y >= target) {
-            const t = (target - pts[i - 1].y) / Math.max(1e-6, pts[i].y - pts[i - 1].y);
-            frac = (pts[i - 1].len + (pts[i].len - pts[i - 1].len) * t) / arc.total;
-            break;
-          }
-        }
-      }
-      el.style.strokeDashoffset = String(1 - Math.min(1, Math.max(0, frac)));
+      el.style.strokeDashoffset = String(1 - progressFractionAt(target, pts, arc.total));
     };
     updateThreadProgressRef.current = updateThreadProgress;
     const measure = () => {
