@@ -1,6 +1,9 @@
 'use client';
 
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
+import { motion, useMotionValue, animate } from 'framer-motion';
+import emailjs from '@emailjs/browser';
+import CurvedInput from './CurvedInput';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Mail01Icon } from '@hugeicons/core-free-icons';
 
@@ -174,6 +177,17 @@ const CONTACT =
   'flex h-9 flex-none cursor-pointer items-center gap-1.5 rounded-[calc(var(--pc-radius)*0.75)] border-none px-3.5 font-[inherit] text-[13px] font-semibold text-[var(--pc-ink)] [background:var(--pc-tile)] [box-shadow:inset_0_0_0_1px_var(--pc-tile-edge),inset_0_1px_0_var(--pc-tile-highlight),var(--pc-tile-shadow)] transition-[filter,transform] duration-200 hover:[filter:var(--pc-hover)] active:scale-[0.96] active:duration-0 active:[filter:var(--pc-press)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--pc-ink)]';
 const GLARE = `${LAYER} mix-blend-overlay`;
 const RIM = `${LAYER} [box-shadow:inset_0_0_0_1px_var(--pc-frame-edge),inset_0_1px_0_var(--pc-frame-highlight)]`;
+const FLIP = 'relative [transform-style:preserve-3d]';
+const FRONT = 'pc-front relative [transform-style:preserve-3d] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]';
+const BACK =
+  'absolute inset-0 flex flex-col overflow-hidden rounded-[calc(var(--pc-radius)+10px)] [background:var(--pc-backdrop)] p-6 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)]';
+const BACK_NOTE = "font-['Caveat',cursive] text-[1.4rem] leading-[1.2] text-[#c4b7fa]";
+const BACK_CLOSE =
+  'absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(243,238,232,0.22)] text-[0.8rem] text-[#f0ece8] transition hover:border-[#fa8265] hover:text-[#fa8265]';
+const BACK_FIELD =
+  'w-full resize-none rounded-[14px] border border-[rgba(243,238,232,0.22)] bg-[#1d1a26] px-4 py-3 text-[0.9rem] text-[#f0ece8] outline-none placeholder:text-[rgba(240,236,232,0.4)] focus:border-[#fa8265]';
+const BACK_SEND =
+  'mt-1 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#fa8265] px-6 py-3 text-[0.9rem] font-semibold text-[#21121a] transition hover:bg-[#ff8b6e] disabled:cursor-default disabled:opacity-60';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -208,12 +222,37 @@ const ProfileCard = ({
   enableMobileTilt = false,
   mobileTiltSensitivity = 5,
   intro = true,
+  flipSignal = 0,
   className = ''
 }) => {
   const rootRef = useRef(null);
   const engineRef = useRef(null);
   const settings = { enableTilt, tiltStrength, parallax, mobileTiltSensitivity, intro };
   const settingsRef = useRef(settings);
+
+  // ── Contact flip state ──────────────────────────────────────────────
+  // Credentials live in .env.local (VITE_EMAILJS_* — see that file).
+  // The values are baked in by Vite; they are also set in Vercel's
+  // Environment Variables for production.
+  const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+  const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+  const EMAILJS_READY = !!(EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [formError, setFormError] = useState('');
+  const turn = useMotionValue(0);
+  const flip = () => {
+    animate(turn, turn.get() + 180, { type: 'spring', stiffness: 170, damping: 20, restDelta: 0.05 });
+    setIsFlipped(f => !f);
+  };
+  useEffect(() => {
+    // External CTAs ask for the FORM side — if it is already showing,
+    // just scroll, don't flip back to the profile.
+    if (flipSignal > 0 && !isFlipped) flip();
+  }, [flipSignal]);
   settingsRef.current = settings;
 
   useEffect(() => {
@@ -411,6 +450,35 @@ const ProfileCard = ({
     ? `linear-gradient(180deg, color-mix(in srgb, ${backdropColor}, #ffffff 12%) 0%, color-mix(in srgb, ${backdropColor}, #000000 18%) 100%)`
     : 'var(--pc-tile)';
 
+  const handleSubmit = async event => {
+    event.preventDefault();
+    if (sending) return;
+    setFormError('');
+    if (!form.name.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email) || !form.message.trim()) {
+      setFormError('Please add your name, a valid email, and a message.');
+      return;
+    }
+    setSending(true);
+    try {
+      if (EMAILJS_READY) {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { from_name: form.name, reply_to: form.email, message: form.message }, { publicKey: EMAILJS_PUBLIC_KEY });
+      } else {
+        // Placeholder mode — paste your EmailJS IDs above to send for real.
+        await new Promise(resolve => setTimeout(resolve, 900));
+      }
+      setSent(true);
+      setForm({ name: '', email: '', message: '' });
+      setTimeout(() => {
+        setSent(false);
+        flip();
+      }, 1100);
+    } catch (err) {
+      setFormError("Couldn't send — please try again in a moment.");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div
       ref={rootRef}
@@ -432,7 +500,9 @@ const ProfileCard = ({
         '--pc-holo-detail': iconUrl && foil === 'dark' ? 1 : 0
       }}
     >
-      <div className={BODY}>
+      <motion.div className={FLIP} style={{ rotateY: turn, transformStyle: 'preserve-3d' }} initial={false} data-flipped={isFlipped || undefined}>
+        <div className={FRONT}>
+          <div className={BODY}>
         <div className={TILE}>
           <span className={LAYER} style={SHEEN_STYLE} />
           <span className={HOLO} style={HOLO_STYLE}>
@@ -476,7 +546,7 @@ const ProfileCard = ({
               <button
                 type="button"
                 className={CONTACT}
-                onClick={onContactClick}
+                onClick={() => { onContactClick?.(); flip(); }}
                 aria-label={name ? `${contactText} ${name}` : contactText}
               >
                 <HugeiconsIcon icon={Mail01Icon} size={16} strokeWidth={1.8} />
@@ -489,7 +559,69 @@ const ProfileCard = ({
         <span className={GLARE} style={GLARE_STYLE} />
         <span className={LAYER} style={SHADE_STYLE} />
         <span className={RIM} />
-      </div>
+          </div>
+        </div>
+        <div className={BACK}>
+          <button type="button" className={BACK_CLOSE} onClick={flip} aria-label="Back to profile">✕</button>
+          <svg viewBox="0 0 300 64" className="mb-1 h-auto w-full" aria-hidden="false" role="img">
+            <path id="flip-note-arc" d="M 14 52 Q 150 10 286 52" fill="none" />
+            <text fill="#c4b7fa" fontFamily="'Caveat', cursive" fontSize="27" fontWeight="600">
+              <textPath href="#flip-note-arc" startOffset="50%" textAnchor="middle">still curious? let&apos;s talk.</textPath>
+            </text>
+          </svg>
+          <div className="flex flex-1 flex-col gap-2.5">
+            <CurvedInput
+              value={form.name}
+              onChange={value => setForm(f => ({ ...f, name: value }))}
+              type="text"
+              name="from_name"
+              placeholder="Your name"
+              ariaLabel="Your name"
+              width={288}
+              bend={14}
+              height={52}
+              fontSize={14}
+              theme="dark"
+              showButton={false}
+              backgroundColor="#1d1a26"
+              textColor="#f0ece8"
+              placeholderColor="rgba(240,236,232,0.4)"
+              borderColor="rgba(243,238,232,0.22)"
+            />
+            <CurvedInput
+              value={form.email}
+              onChange={value => setForm(f => ({ ...f, email: value }))}
+              type="email"
+              name="reply_to"
+              placeholder="Your email"
+              ariaLabel="Your email"
+              width={288}
+              bend={14}
+              height={52}
+              fontSize={14}
+              theme="dark"
+              showButton={false}
+              backgroundColor="#1d1a26"
+              textColor="#f0ece8"
+              placeholderColor="rgba(240,236,232,0.4)"
+              borderColor="rgba(243,238,232,0.22)"
+            />
+            <textarea
+              className={BACK_FIELD}
+              rows={4}
+              placeholder="Tell me what you have in mind..."
+              value={form.message}
+              onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+              required
+            />
+            <button type="button" className={BACK_SEND} disabled={sending} onClick={handleSubmit}>
+              {sending ? 'Sending…' : 'Send message'}
+            </button>
+            {sent && <p className="font-['Caveat',cursive] text-[1.3rem] text-[#c4b7fa]">got it! I'll reply soon.</p>}
+            {formError && <p className="text-[0.8rem] text-[#ff8b6e]">{formError}</p>}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

@@ -98,11 +98,33 @@ export default function App() {
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
   const [thread, setThread] = useState({ width: 0, height: 0, path: '' });
   const [isMobileNav, setIsMobileNav] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+  const [flipSignal, setFlipSignal] = useState(0);
   const progressRef = useRef(null);
   const arcRef = useRef(null);
   const updateThreadProgressRef = useRef(null);
   const activeProject = projects[activeProjectIndex];
 
+  const openContactFlip = () => {
+    document.querySelector('.contact-profile')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => setFlipSignal(n => n + 1), 650);
+  };
+  // Every "get in touch" affordance is an anchor to #contact — one delegated
+  // handler turns all of them into scroll+flip. The contact section's own
+  // "Discuss a project" button is already there, so it only flips the card.
+  useEffect(() => {
+    const onClick = event => {
+      const anchor = event.target.closest?.('a[href="#contact"]');
+      if (!anchor) return;
+      event.preventDefault();
+      if (anchor.classList.contains('contact-cta')) {
+        setFlipSignal(n => n + 1);
+        return;
+      }
+      openContactFlip();
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, []);
   useEffect(() => {
     const query = window.matchMedia('(max-width: 767px)');
     const onChange = event => setIsMobileNav(event.matches);
@@ -263,7 +285,7 @@ export default function App() {
             { label: 'Projects', link: '#projects' },
             { label: 'Experience', link: '#experience' }
           ]}
-          cta={{ label: 'Say hello', link: 'mailto:nsshreeram@gmail.com', ariaLabel: 'Say hello — email Shreeram' }}
+          cta={{ label: 'Say hello', link: '#contact', ariaLabel: 'Say hello — go to contact' }}
           socialItems={[
             { label: 'GitHub', link: 'https://github.com/TechRam09' },
             { label: 'LinkedIn', link: 'https://www.linkedin.com/in/shreeram-ns/' }
@@ -279,7 +301,7 @@ export default function App() {
         <div className="header-navigation">
           <PillNav ariaLabel="Portfolio" items={navigation} activeHref={activeSection} size="sm" surface="glass" theme="dark" itemStyle="text" hoverEffect="fill" indicator="dot" barColor="rgba(34, 25, 39, 0.48)" textColor="#E5DDE7" highlightColor="#FA8265" highlightTextColor="#1B111D" collapse={isMobileNav ? 'always' : 'never'} />
         </div>
-        <a className="header-contact" href="mailto:nsshreeram@gmail.com"><span>Say hello</span><ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} /></a>
+        <a className="header-contact" href="#contact"><span>Say hello</span><ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.8} /></a>
       </header>
 
       <section className="hero" id="story" aria-labelledby="hero-title" data-thread-section>
@@ -299,7 +321,7 @@ export default function App() {
             <p className="hero-copy">In 2021, curiosity led me into code. Since then, I’ve followed it through a Computer Science degree and two internships to Java full-stack engineering at Bounteous, where I currently work with Morgan Stanley.</p>
             <div className="hero-actions">
               <a className="action-primary" href="#projects">Explore my work <ArrowDown aria-hidden="true" size={17} strokeWidth={1.8} /></a>
-              <a className="action-secondary" href="mailto:nsshreeram@gmail.com">Get in touch</a>
+              <a className="action-secondary" href="#contact">Get in touch</a>
             </div>
           </div>
           <div className="hero-coordinate" aria-hidden="true"><span>SCROLL TO FOLLOW THE THREAD</span><span className="coordinate-line" /></div>
@@ -387,7 +409,7 @@ export default function App() {
         <div className="contact-orbit" aria-hidden="true" data-story-node><span /><span /><span /></div>
         <h2><span className="hero-title-line"><SplitText text="Need a website" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="or web app?" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2>
         <p>Tell me what you have in mind. We can talk through the design, development, scope, and next steps.</p>
-        <a className="contact-cta" href="mailto:nsshreeram@gmail.com">Discuss a project <ArrowUpRight size={19} aria-hidden="true" /></a>
+        <a className="contact-cta" href="#contact">Discuss a project <ArrowUpRight size={19} aria-hidden="true" /></a>
         <div className="contact-profile">
           <ProfileCard
             avatarUrl="/portrait-cutout.png"
@@ -395,8 +417,8 @@ export default function App() {
             title="Java Full-Stack Developer"
             handle="TechRam09"
             status="Online"
+            flipSignal={flipSignal}
             contactText="Say hello"
-            onContactClick={() => { window.location.href = 'mailto:nsshreeram@gmail.com'; }}
             theme="dark"
             backdropColor="#241d31"
           />
@@ -410,7 +432,7 @@ export default function App() {
         columns={[
           { title: 'Pages', links: [{ label: 'Story', href: '#story' }, { label: 'Projects', href: '#projects' }, { label: 'Experience', href: '#experience' }] },
           { title: 'Elsewhere', links: [{ label: 'GitHub', href: 'https://github.com/TechRam09' }, { label: 'LinkedIn', href: 'https://www.linkedin.com/in/shreeram-ns/' }] },
-          { title: 'Contact', links: [{ label: 'Say hello', href: 'mailto:nsshreeram@gmail.com' }] }
+          { title: 'Contact', links: [{ label: 'Say hello', href: '#contact' }] }
         ]}
         palette={{ background: '#191620', ink: '#f0ece8', warm: '#fa8265' }}
         height="440px"

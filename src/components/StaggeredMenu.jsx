@@ -20,10 +20,12 @@ export const StaggeredMenu = ({
   accentColor = '#5227FF',
   closeOnClickAway = true,
   onMenuOpen,
-  onMenuClose
+  onMenuClose,
+  onCtaClick
 }) => {
   const [open, setOpen] = useState(false);
   const openRef = useRef(false);
+  const onCtaClickRef = useRef(onCtaClick);
 
   const panelRef = useRef(null);
   const preLayersRef = useRef(null);
@@ -484,7 +486,7 @@ export const StaggeredMenu = ({
                 className="header-contact sm-cta"
                 href={cta.link}
                 aria-label={cta.ariaLabel}
-                onClick={() => closeMenu()}
+                onClick={() => { closeMenu(); onCtaClickRef.current?.(); }}
               >
                 <span>{cta.label}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="16" height="16" aria-hidden="true"><path d="M7 7h10v10" /><path d="M7 17 17 7" /></svg>
