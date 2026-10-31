@@ -11,3 +11,6 @@ dist
 .playwright-mcp/
 .impeccable/
 MCP_SETUP.md
+
+# graphify knowledge graph (local artifact)
+graphify-out/

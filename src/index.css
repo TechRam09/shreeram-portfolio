@@ -474,7 +474,6 @@ a:focus-visible {
 .chapter-copy { padding-top: 2px; }
 .chapter-year { color: #bb91bb; font-size: 10px; }
 .chapter-thread-note { position: relative; z-index: 4; display: table; max-width: 180px; margin-top: 6px; padding: 1px 5px; color: #c4b7fa; font-family: 'Caveat', cursive; font-size: 17px; line-height: 1.1; }
-.chapter-2 .chapter-thread-note { margin-left: auto; text-align: right; }
 .chapter-3 .chapter-thread-note { margin-left: clamp(0px, 5vw, 45px); }
 .chapter-4 .chapter-thread-note { margin-left: clamp(0px, 2vw, 18px); }
 .chapter h3 { margin: 8px 0 8px; color: var(--paper); font-family: var(--font-display); font-size: clamp(22px, 2.4vw, 30px); font-weight: 500; letter-spacing: -0.035em; }
@@ -483,7 +482,7 @@ a:focus-visible {
 .section-story-note { position: relative; z-index: 4; display: block; width: max-content; max-width: 100%; margin-top: 17px; padding: 2px 6px; color: #c4b7fa; font-family: 'Caveat', cursive; font-size: 19px; line-height: 1.1; }
 .projects-story-note { position: absolute; top: -113px; left: 50%; margin: 0; transform: translateX(-50%) rotate(-3deg); }
 .toolkit-story-note { position: absolute; right: 94px; bottom: 4px; margin: 0; background: #14131a; transform: rotate(-3deg); }
-.experience-story-note { position: absolute; top: calc(100% + 2px); left: calc(-1 * clamp(27px, 5vw, 80px) - 40px); margin: 0; background: #191620; transform: translateX(-50%) rotate(-3deg); }
+.experience-story-note { position: absolute; top: calc(100% + 2px); left: calc(-1 * clamp(27px, 5vw, 80px) - 40px); margin: 0; transform: translateX(-50%) rotate(-3deg); }
 
 .projects {
   padding-top: 142px;
@@ -597,7 +596,17 @@ a:focus-visible {
 .toolkit { padding-top: 145px; padding-bottom: 145px; background: #14131a; }
 .toolkit-mark { display: flex; align-items: flex-end; gap: 12px; padding: 16px; border: 1px solid rgba(250, 118, 86, 0.27); background: #14131a; color: var(--ember); }
 .toolkit-mark span { color: #c0afc4; font-size: 8px; }
-.skill-cloud { display: flex; flex-wrap: wrap; gap: 11px; max-width: 920px; margin-top: 62px; }
+.skill-pile {
+  height: 150px;
+  overflow: hidden;
+  max-width: 980px;
+  margin-top: 40px;
+  border: 1px solid rgba(243, 238, 232, 0.08);
+  border-radius: 8px;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(103, 80, 140, 0.12), transparent 60%),
+    rgba(17, 16, 23, 0.45);
+}
 .skill-chip { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid rgba(243, 238, 232, 0.15); background: rgba(243, 238, 232, 0.025); color: #e3d9e5; font-size: 13px; transition: border-color 180ms ease, background 180ms ease, transform 180ms ease; }
 .skill-chip:hover { transform: translateY(-3px); border-color: rgba(250, 118, 86, 0.62); background: rgba(250, 118, 86, 0.06); }
 .skill-count { color: var(--ember); font: 8px ui-monospace, monospace; }
@@ -808,7 +817,6 @@ body { caret-color: var(--ember); }
   .chapter { min-height: 130px; grid-template-columns: 40px 1fr; gap: 19px; }
   .chapter-node { width: 40px; height: 40px; font-size: 9px; }
   .chapter-thread-note { max-width: 180px; margin: 6px 0 0; }
-  .chapter-2 .chapter-thread-note { margin-left: 25px; }
   .chapter-4 .chapter-thread-note { margin-left: 18px; }
   .chapter-1 .chapter-thread-note,
   .chapter-2 .chapter-thread-note,
@@ -917,4 +925,11 @@ body { caret-color: var(--ember); }
     width: min(340px, calc(100% - 44px));
     margin: 36px auto 0;
   }
+}
+
+/* PhysicsTagPile sizes its world from its root div — give it the frame's height */
+.skill-pile > div {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
