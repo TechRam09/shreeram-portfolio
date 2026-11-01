@@ -701,8 +701,26 @@ a:focus-visible {
   85%, 100% { transform: translateX(120%); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .contact-cta, .contact-cta::after, .action-primary, .action-primary::after, .action-secondary, .action-secondary::after { animation: none; }
+  .contact-cta, .contact-cta::after, .action-primary, .action-primary::after, .action-secondary, .action-secondary::after, .pc-send, .pc-send::after { animation: none; }
 }
+/* Send-message button carries the same metallic treatment as the other CTAs. */
+.pc-send {
+  position: relative;
+  overflow: hidden;
+  background-image: linear-gradient(110deg, #fa8265 0%, #ff9d80 30%, #f97a5c 55%, #ff9d80 80%, #fa8265 100%);
+  background-size: 220% 100%;
+  animation: cta-metal 5.5s ease-in-out infinite;
+}
+.pc-send::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.5) 50%, transparent 62%);
+  transform: translateX(-120%);
+  animation: cta-sheen 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+.pc-send:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.08); }
 .contact-cta:hover { gap: 28px; background: #ff8b6e; }
 .contact-orbit { position: absolute; z-index: 0; top: 20px; right: 3%; width: min(42vw, 530px); aspect-ratio: 1; border: 1px solid rgba(188, 144, 195, 0.12); border-radius: 50%; }
 .contact-orbit::before, .contact-orbit::after { position: absolute; inset: 12%; border: 1px solid rgba(188, 144, 195, 0.1); border-radius: 50%; content: ''; }

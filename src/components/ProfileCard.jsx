@@ -188,7 +188,7 @@ const BACK_CLOSE =
 const BACK_FIELD =
   'w-full resize-none rounded-[14px] border border-[rgba(243,238,232,0.22)] bg-[#1d1a26] px-4 py-3 text-[0.9rem] text-[#f0ece8] outline-none placeholder:text-[rgba(240,236,232,0.4)] focus:border-[#fa8265]';
 const BACK_SEND =
-  'mt-1 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#fa8265] px-6 py-3 text-[0.9rem] font-semibold text-[#21121a] transition hover:bg-[#ff8b6e] disabled:cursor-default disabled:opacity-60';
+  'pc-send mt-1 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-[0.9rem] font-semibold text-[#21121a] transition disabled:cursor-default disabled:opacity-60';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
