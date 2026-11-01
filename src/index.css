@@ -913,7 +913,7 @@ body { caret-color: var(--ember); }
   .project-preview-info h3 { font-size: 31px; }
   .experience-list { margin-top: 43px; }
   .experience-item { grid-template-columns: 1fr; gap: 9px 14px; padding: 22px 28px 22px 0; }
-  .experience-thread-point { top: 50%; right: 5px; left: auto; }
+  .experience-thread-point { top: 50%; left: -4px; right: auto; }
   .experience-story-note { top: calc(100% + 14px); left: 50%; }
   .experience-date { grid-column: 1 / -1; }
   .experience-item > div { grid-column: 1; }
@@ -1024,3 +1024,106 @@ body { caret-color: var(--ember); }
 .sm-toggle,
 .contact-profile button,
 .skill-pile div { cursor: pointer; }
+
+/* Mobile thread zigzag: invisible rail anchors the glow path flows through
+   (hidden on desktop — the desktop route keeps its own geometry) */
+.thread-anchor { display: none; }
+/* Journey (phone + tablet): hold the right rail past the heading before the
+   sweep down to the chapters, so the thread never crosses the text. */
+@media (max-width: 1024px) {
+  .journey { position: relative; }
+  .thread-anchor-journey-entry { top: 206px; right: 20px; position: absolute !important; }
+  .thread-anchor-journey-mid { top: 300px; left: 50%; position: absolute !important; }
+}
+@media (max-width: 767px) {
+  .journey, .projects, .toolkit { position: relative; }
+  .thread-anchor {
+    display: block;
+    position: absolute;
+    width: 2px;
+    height: 2px;
+  }
+  /* Entry: the thread drops down the left after the last chapter, then sweeps
+     right along the section boundary onto the projects rail (user trace). */
+  .thread-anchor-journey-exit { bottom: 12px; left: 26px; position: absolute !important; }
+  .thread-anchor-projects-top { top: 60px; right: 46px; position: absolute !important; }
+  .thread-anchor-projects-mid { top: 50%; right: 46px; position: absolute !important; }
+  .thread-anchor-projects-bottom { bottom: 140px; right: 46px; position: absolute !important; }
+  /* Toolkit: the thread dives behind the opaque skill pile at its top-right
+     and re-emerges at the bottom-left, then passes the education record in a
+     new left margin (user trace). */
+  .skill-pile { position: relative; z-index: 3; }
+  .thread-anchor-pile-entry { top: 6px; right: 33%; position: absolute !important; }
+  .thread-anchor-pile-exit { bottom: 6px; left: 45%; position: absolute !important; }
+  .education-line { position: relative; padding-left: 26px; }
+  .thread-anchor-education-entry { top: -12px; left: 14px; position: absolute !important; }
+  .thread-anchor-toolkit-left { top: 50%; left: 14px; position: absolute !important; }
+  .thread-anchor-education-exit { bottom: -10px; left: 14px; position: absolute !important; }
+  /* The profile card stacks above the thread so its end hides behind it.
+     top/right must be neutralized — position:relative re-activates the
+     desktop card's absolute offsets otherwise. */
+  .contact-profile { position: relative; z-index: 3; top: auto; right: auto; }
+  /* Experience: the thread sweeps in from the projects rail, then runs down
+     the left margin between the dots and the record text (user trace). */
+  .experience-list { position: relative; }
+  .thread-anchor-experience-entry { top: -90px; right: 46px; position: absolute !important; }
+  .thread-anchor-experience-exit { bottom: -26px; left: 12px; position: absolute !important; }
+  .experience-item { padding-left: 44px; }
+  .experience-thread-point { top: 50%; left: 12px; right: auto; }
+  /* Projects note sits by the thread rail on phone. */
+  .projects-story-note { left: auto; right: 64px; transform: rotate(-3deg); }
+  /* Phone measure: keep the lede and project copy off the right edge. */
+  .hero-copy { max-width: 19rem; }
+  .project-preview-info p { max-width: 20.5rem; }
+  .project-visual { height: clamp(190px, 52vw, 240px); }
+  /* Frosted navbar band on phone — only while the menu is closed. */
+  .staggered-menu-wrapper:not([data-open]) .staggered-menu-header {
+    background: rgba(17, 16, 23, 0.55);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-bottom: 1px solid rgba(243, 238, 232, 0.08);
+  }
+  /* Contact rings re-centered behind the profile card on phone. */
+  .contact-orbit {
+    top: auto;
+    right: 50%;
+    bottom: 44px;
+    transform: translateX(50%);
+    width: min(94vw, 430px);
+  }
+  /* Thread route: sweep right across the section top, curve down the right
+     side, and dive behind the card at its top-right corner (user trace). */
+  .contact { position: relative; overflow-x: clip; }
+  .thread-anchor-contact-arc { top: 44px; right: 30px; position: absolute !important; }
+  .thread-anchor-contact-end { top: 461px; right: 36%; position: absolute !important; }
+  /* Option wheel on phone: horizontal fan of vertical-text labels */
+  .project-picker-wheel [role='option'] {
+    writing-mode: vertical-rl !important;
+    text-orientation: mixed !important;
+    left: 45% !important;
+    font-size: 1.45rem !important;
+  }
+  /* The repo arrow follows the fan's downward flow instead of pointing up.
+     It stays inline so it lands on the text column itself — but without the
+     base margin, which inflated the selected label's line box and ate the
+     right-hand gap. */
+  .project-picker-wheel .ow-arrow-link {
+    width: 22px;
+    height: 22px;
+    margin: 4px 0 0 !important;
+    vertical-align: middle;
+    position: relative;
+    left: -6px;
+  }
+  .project-picker-wheel .ow-arrow-link svg { transform: rotate(90deg); }
+  .project-picker-wheel {
+    height: 320px;
+    /* Vertical swipes scroll the page; the fan answers horizontal ones. */
+    touch-action: pan-y;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  }
+  /* Physics pile on phone: room for the full stack + smaller chips */
+  .skill-pile { height: 230px; max-width: 100%; }
+  .skill-pile div { font-size: 12px !important; padding: 8px 12px !important; }
+}

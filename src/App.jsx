@@ -152,6 +152,10 @@ export default function App() {
         // animation transforms, so the first paint is already correct.
         const points = [...page.querySelectorAll('[data-story-node]')]
           .filter(node => node.getClientRects().length > 0)
+          // Desktop-route nodes: on the phone zigzag the project visual stays
+          // out of the path, and the contact orbit is decoration only — the
+          // thread ends at the card's top-right instead.
+          .filter(node => !(window.innerWidth < 768 && ['project-visual', 'contact-orbit'].some(c => node.classList.contains(c))))
           .map(node => {
             let x = node.offsetLeft, y = node.offsetTop, parent = node.offsetParent;
             while (parent && parent !== page) {
@@ -303,6 +307,8 @@ export default function App() {
       </section>
 
       <section className="journey section-wrap" aria-labelledby="journey-title" data-thread-section>
+        <span className="thread-anchor thread-anchor-journey-entry" data-story-node aria-hidden="true" />
+        <span className="thread-anchor thread-anchor-journey-mid" data-story-node aria-hidden="true" />
         <div className="journey-intro">
           <div className="section-heading"><h2 id="journey-title"><span className="hero-title-line"><SplitText text="A question turned" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="into a direction." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2><p>The path so far, one chapter at a time.</p></div>
           <div className="journey-note"><Braces size={19} aria-hidden="true" /><span>Still curious.<br />Still building.</span></div>
@@ -315,10 +321,14 @@ export default function App() {
             </Reveal>
           ))}
         </div>
+        <span className="thread-anchor thread-anchor-journey-exit" data-story-node aria-hidden="true" />
       </section>
 
       <section className="projects section-wrap" id="projects" aria-labelledby="projects-title" data-thread-section>
         <div className="projects-topline"><div className="section-heading"><h2 id="projects-title"><span className="hero-title-line"><SplitText text="Ideas made" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="tangible." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2><p>A few things I’ve explored through code.</p></div><a className="text-link" href="https://github.com/TechRam09?tab=repositories" target="_blank" rel="noreferrer">All repositories <MoveUpRight size={16} aria-hidden="true" /></a></div>
+        <span className="thread-anchor thread-anchor-projects-top" data-story-node aria-hidden="true" />
+        <span className="thread-anchor thread-anchor-projects-mid" data-story-node aria-hidden="true" />
+        <span className="thread-anchor thread-anchor-projects-bottom" data-story-node aria-hidden="true" />
         <div className="projects-explorer">
           <div className="project-picker" role="group" aria-label="Choose a project to preview">
             <div className="project-picker-wheel">
@@ -330,7 +340,7 @@ export default function App() {
                 textColor="#9f91a4"
                 activeColor="#f0ece8"
                 fontSize={2.4}
-                spacing={1.75}
+                spacing={2.2}
                 tilt={16}
                 curve={1}
                 inset={18}
@@ -354,36 +364,42 @@ export default function App() {
       <section className="experience section-wrap" id="experience" aria-labelledby="experience-title" data-thread-section>
         <div className="experience-heading"><div className="section-heading"><h2 id="experience-title"><span className="hero-title-line"><SplitText text="Learning by" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="making it real." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2><p>From first pull requests to systems built with a team.</p></div></div>
         <div className="experience-list">
+          <span className="thread-anchor thread-anchor-experience-entry" data-story-node aria-hidden="true" />
           <span className="section-story-note experience-story-note">learning with every new challenge</span>
           <Reveal className="experience-item" reduced={prefersReducedMotion}><span className="experience-thread-point" data-story-node aria-hidden="true" /><span className="experience-date">MAY 2024 — MAR 2025</span><div><h3>Full-Stack Developer Intern</h3><p>Logarithm Technologies</p></div></Reveal>
           <Reveal className="experience-item" delay={0.08} reduced={prefersReducedMotion}><span className="experience-thread-point" data-story-node aria-hidden="true" /><span className="experience-date">NOV 2023 — APR 2024</span><div><h3>Frontend Developer Intern</h3><p>Logarithm Technologies</p></div></Reveal>
           <Reveal className="experience-item experience-current" delay={0.16} reduced={prefersReducedMotion}><span className="experience-thread-point" data-story-node aria-hidden="true" /><span className="experience-date">CURRENT</span><div><h3>Java Full-Stack Developer</h3><p>Bounteous <span className="experience-client">· Morgan Stanley engagement</span></p></div></Reveal>
+          <span className="thread-anchor thread-anchor-experience-exit" data-story-node aria-hidden="true" />
         </div>
       </section>
 
       <section className="toolkit section-wrap" aria-labelledby="toolkit-title" data-thread-section>
         <div className="toolkit-top"><div className="section-heading"><h2 id="toolkit-title"><span className="hero-title-line"><SplitText text="Tools for turning" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="questions into things." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2><p>A growing set of tools I reach for across the stack.</p></div><div className="toolkit-mark" aria-hidden="true" data-story-node><Code2 size={36} strokeWidth={1.15} /></div><span className="section-story-note toolkit-story-note">still adding to the toolbox</span></div>
         <div className="skill-pile">
+          <span className="thread-anchor thread-anchor-pile-entry" data-story-node aria-hidden="true" />
           <PhysicsTagPile
             tags={skills.map(label => ({ label, featured: featuredSkills.includes(label) }))}
-            colors={['#241d31', '#2b2340', '#1d1a26', '#2e2640']}
+            colors={['#332a4d', '#3a3155', '#2b2340', '#413860']}
             featuredColor="#fa8265"
             textColor="#f0ece8"
             borderColor="rgba(243, 238, 232, 0.16)"
             borderWidth={1}
-            background="rgba(25, 22, 32, 0.55)"
+            background="#15131c"
             dropStyle="rain"
             font={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14 }}
           />
+          <span className="thread-anchor thread-anchor-pile-exit" data-story-node aria-hidden="true" />
         </div>
-        <div className="education-line"><span>EDUCATION</span><p><strong>B.E. Computer Science & Engineering</strong><br />Vidya Vikas Institute of Engineering and Technology <span>· 2025</span></p></div>
+        <div className="education-line"><span>EDUCATION</span><p><strong>B.E. Computer Science & Engineering</strong><br />Vidya Vikas Institute of Engineering and Technology <span>· 2025</span></p><span className="thread-anchor thread-anchor-education-entry" data-story-node aria-hidden="true" /><span className="thread-anchor thread-anchor-toolkit-left" data-story-node aria-hidden="true" /><span className="thread-anchor thread-anchor-education-exit" data-story-node aria-hidden="true" /></div>
       </section>
 
       <footer className="contact section-wrap" id="contact" data-thread-section>
         <div className="contact-orbit" aria-hidden="true" data-story-node><span /><span /><span /></div>
+        <span className="thread-anchor thread-anchor-contact-arc" data-story-node aria-hidden="true" />
         <h2><span className="hero-title-line"><SplitText text="Need a website" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="or web app?" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2>
         <p>Tell me what you have in mind. We can talk through the design, development, scope, and next steps.</p>
         <a className="contact-cta" href="#contact">Discuss a project <ArrowUpRight size={19} aria-hidden="true" /></a>
+        <span className="thread-anchor thread-anchor-contact-end" data-story-node aria-hidden="true" />
         <div className="contact-profile">
           <ProfileCard
             avatarUrl="/portrait-cutout.png"

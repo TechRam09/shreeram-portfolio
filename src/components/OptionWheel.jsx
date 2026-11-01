@@ -57,11 +57,17 @@ const OptionWheel = ({
   const lastTickRef = useRef(0);
   const [selectedIndex, setSelectedIndex] = useState(defaultSelected);
   const [isDragging, setIsDragging] = useState(false);
+  // True only while the wheel is parked on a selection — the repo arrow waits
+  // for this, so it appears when a label arrives at center, not mid-swipe.
+  const [atRest, setAtRest] = useState(true);
+  const settledRef = useRef(true);
 
   const remPx = typeof window !== 'undefined' ? parseFloat(getComputedStyle(document.documentElement).fontSize) || 16 : 16;
 
   onChangeRef.current = onChange;
+  const fanLayout = typeof window !== 'undefined' && window.innerWidth < 640;
   cfgRef.current = {
+    fan: fanLayout,
     count: items.length,
     items,
     rowH: Math.max(fontSize * spacing * remPx, 1),
@@ -93,6 +99,14 @@ const OptionWheel = ({
     let next = cur + (target - cur) * k;
     const settled = Math.abs(target - next) < 0.001;
     if (settled) next = target;
+    // "Arrived" is perceptual — well before the exponential ease's long tail —
+    // and never true mid-drag, so the repo arrow shows when a label visually
+    // lands on center and not a moment sooner.
+    const arrived = Math.abs(target - next) < 0.08 && !dragRef.current;
+    if (arrived !== settledRef.current) {
+      settledRef.current = arrived;
+      setAtRest(arrived);
+    }
     posRef.current = next;
 
     const els = itemRefs.current;
@@ -114,13 +128,32 @@ const OptionWheel = ({
       let x = 0;
       let y = d * cfg.rowH;
       let rot = 0;
-      if (R > 0) {
+      if (cfg.fan) {
+        // Phone fan: every option's top hangs from one pivot line just under
+        // the top-center, and the body sweeps down-outward from there — the
+        // previous item's column down-left, the next one down-right, the
+        // selected straight down. Tops stay aligned regardless of label
+        // length, so the columns read as curves leaving a single point.
+        const fd = -d;
+        const H = rootRef.current ? rootRef.current.offsetHeight : 260;
+        x = fd * 46;
+        y = -H * 0.38;
+        rot = -fd * Math.min(38 + (Math.abs(fd) - 1) * 8, 55);
+        el.style.transformOrigin = 'top center';
+      } else if (R > 0) {
         const ang = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, d * tiltRad));
         y = R * Math.sin(ang);
         x = -mirror * R * (1 - Math.cos(ang)) * cfg.curve;
         rot = (mirror * ang * 180) / Math.PI;
+        // A tilted label sweeps sideways by width x sin(angle); give that much
+        // clearance back to its pivot line so a long neighbour's near end
+        // never closes in on the selected row.
+        const sweep = ((el.offsetWidth || 0) * Math.abs(Math.sin(ang))) / 2;
+        y += sweep * (d < 0 ? -1 : 1);
       }
-      el.style.transform = `translate(${x.toFixed(2)}px, calc(${y.toFixed(2)}px - 50%)) rotate(${rot.toFixed(3)}deg)`;
+      el.style.transform = cfg.fan
+        ? `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${rot.toFixed(3)}deg)`
+        : `translate(${x.toFixed(2)}px, calc(${y.toFixed(2)}px - 50%)) rotate(${rot.toFixed(3)}deg)`;
       el.style.opacity = String(Math.max(cfg.minOpacity, 1 - dist * cfg.fade));
       el.style.filter = cfg.blur > 0 ? `blur(${(dist * cfg.blur).toFixed(2)}px)` : 'none';
       el.style.setProperty('--ow-p', Math.max(0, 1 - Math.min(dist, 1)).toFixed(4));
@@ -184,11 +217,14 @@ const OptionWheel = ({
     let accumulated = 0;
     let lastStepAt = 0;
     const onWheel = e => {
-      e.preventDefault();
       const cfg = cfgRef.current;
+      // The phone fan must never hijack vertical scrolling — only a
+      // horizontal scroll (trackpad sideways, shift+wheel) turns it.
+      if (cfg.fan && Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
       const now = performance.now();
       if (now - lastStepAt < 90) return;
-      accumulated += e.deltaMode === 1 ? e.deltaY * 24 : e.deltaY;
+      accumulated += e.deltaMode === 1 ? e.deltaY * 24 : cfg.fan ? e.deltaX : e.deltaY;
       const threshold = Math.max(cfg.rowH * 0.5, 24);
       if (Math.abs(accumulated) >= threshold) {
         const direction = Math.sign(accumulated);
@@ -206,7 +242,7 @@ const OptionWheel = ({
 
   const handlePointerDown = useCallback(e => {
     if (!cfgRef.current.draggable) return;
-    dragRef.current = { y: e.clientY, start: targetRef.current, id: e.pointerId };
+    dragRef.current = { x: e.clientX, y: e.clientY, start: targetRef.current, id: e.pointerId, axis: null };
     dragMovedRef.current = false;
     setIsDragging(true);
   }, []);
@@ -215,14 +251,20 @@ const OptionWheel = ({
     e => {
       const drag = dragRef.current;
       if (!drag) return;
+      const dx = e.clientX - drag.x;
       const dy = e.clientY - drag.y;
-      if (!dragMovedRef.current && Math.abs(dy) > 4) {
+      if (!drag.axis) {
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+        // Direction lock: the phone fan answers horizontal drags only, so a
+        // vertical swipe is handed straight back to the page scroll.
+        drag.axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+        const wanted = cfgRef.current.fan ? 'x' : 'y';
+        if (drag.axis !== wanted) return;
         dragMovedRef.current = true;
-        // Capture only once a real drag starts, so plain clicks still reach
-        // the items and navigate to them.
-        rootRef.current?.setPointerCapture(drag.id);
+        try { rootRef.current?.setPointerCapture(drag.id); } catch { /* capture is best-effort */ }
       }
-      if (dragMovedRef.current) applyTarget(drag.start - dy / cfgRef.current.rowH, false);
+      if (drag.axis === 'x') applyTarget(drag.start + dx / cfgRef.current.rowH, false);
+      else applyTarget(drag.start - dy / cfgRef.current.rowH, false);
     },
     [applyTarget]
   );
@@ -280,7 +322,7 @@ const OptionWheel = ({
       role="listbox"
       tabIndex={0}
       aria-label="Option wheel"
-      className={`relative h-full w-full select-none overflow-hidden outline-none [touch-action:none] ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}${className ? ` ${className}` : ''}`}
+      className={`relative h-full w-full select-none overflow-clip outline-none ${fanLayout ? '[touch-action:pan-y]' : '[touch-action:none]'} ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}${className ? ` ${className}` : ''}`}
       style={{
         '--ow-text-color': textColor,
         '--ow-active-color': activeColor,
@@ -307,7 +349,7 @@ const OptionWheel = ({
           onClick={() => handleItemClick(index)}
         >
           {label}
-          {links[index] && selectedIndex === index && (
+          {links[index] && selectedIndex === index && atRest && (
             <a
               href={links[index]}
               target="_blank"
