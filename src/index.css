@@ -1054,9 +1054,11 @@ body { caret-color: var(--ember); }
   .thread-anchor-journey-mid { top: 300px; left: 50%; position: absolute !important; }
 }
 /* Tablet band: dial labels shrink with the viewport (38px desktop size
-   overflows the narrower left column). */
+   overflows the narrower left column). The clamp floor also drops so the
+   longest name + repo arrow always fits the narrower column. */
 @media (min-width: 768px) and (max-width: 1024px) {
-  .project-picker-wheel [role='option'] { font-size: clamp(1.6rem, 3vw, 2.2rem) !important; }
+  .project-picker-wheel [role='option'] { font-size: clamp(1.2rem, 2.6vw, 2.1rem) !important; }
+  .project-picker-wheel .ow-arrow-link { margin-left: 0 !important; }
 }
 @media (max-width: 767px) {
   .journey, .projects, .toolkit { position: relative; }
