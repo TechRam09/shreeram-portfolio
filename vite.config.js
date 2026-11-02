@@ -10,4 +10,17 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "react-vendor": ["react", "react-dom"],
+          "motion": ["framer-motion"],
+          "gsap": ["gsap", "@gsap/react"],
+          "graphics": ["vgpu"],
+          "icons": ["lucide-react", "@hugeicons/react", "@hugeicons/core-free-icons"],
+        },
+      },
+    },
+  },
 });

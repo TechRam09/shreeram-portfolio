@@ -508,14 +508,19 @@ const ProfileCard = ({
             <span className={HOLO_LAYER} style={SHIFT_STYLE} />
           </span>
           {avatarUrl && (
-            <img
-              className={PHOTO}
-              style={PHOTO_STYLE}
-              src={avatarUrl}
-              alt={name || ''}
-              loading="lazy"
-              draggable={false}
-            />
+            <picture>
+              {avatarUrl.endsWith('.png') && (
+                <source srcSet={avatarUrl.replace(/\.png$/, '.webp')} type="image/webp" />
+              )}
+              <img
+                className={PHOTO}
+                style={PHOTO_STYLE}
+                src={avatarUrl}
+                alt={name ? `${name} portrait` : 'Portrait'}
+                loading="lazy"
+                draggable={false}
+              />
+            </picture>
           )}
           {(name || title) && (
             <>

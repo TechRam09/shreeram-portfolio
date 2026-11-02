@@ -898,7 +898,7 @@ body { caret-color: var(--ember); }
   .projects-explorer { grid-template-columns: minmax(230px, 0.7fr) minmax(0, 1.3fr); gap: 38px; }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 767px) {
   .hero-coordinate { right: auto; left: 0; bottom: 24px; font-size: 8px; }
   .section-wrap { padding-right: 22px; padding-left: 22px; }
   .journey, .experience { display: block; padding-top: 94px; padding-bottom: 98px; }
@@ -1056,9 +1056,11 @@ body { caret-color: var(--ember); }
 /* Tablet band: dial labels shrink with the viewport (38px desktop size
    overflows the narrower left column). The clamp floor also drops so the
    longest name + repo arrow always fits the narrower column. */
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1180px) {
   .project-picker-wheel [role='option'] { font-size: clamp(1.2rem, 2.6vw, 2.1rem) !important; }
   .project-picker-wheel .ow-arrow-link { margin-left: 0 !important; }
+  .hero { min-height: 60svh; }
+  .skill-pile { height: 260px; }
 }
 @media (max-width: 767px) {
   .journey, .projects, .toolkit { position: relative; }
@@ -1152,5 +1154,5 @@ body { caret-color: var(--ember); }
   }
   /* Physics pile on phone: room for the full stack + smaller chips */
   .skill-pile { height: 230px; max-width: 100%; }
-  .skill-pile div { font-size: 12px !important; padding: 8px 12px !important; }
+  .skill-pile div { font-size: 10px !important; padding: 5px 9px !important; }
 }
