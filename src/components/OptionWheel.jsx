@@ -65,7 +65,7 @@ const OptionWheel = ({
   const remPx = typeof window !== 'undefined' ? parseFloat(getComputedStyle(document.documentElement).fontSize) || 16 : 16;
 
   onChangeRef.current = onChange;
-  const fanLayout = typeof window !== 'undefined' && window.innerWidth < 640;
+  const fanLayout = typeof window !== 'undefined' && window.innerWidth < 768;
   cfgRef.current = {
     fan: fanLayout,
     count: items.length,

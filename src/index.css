@@ -1090,6 +1090,8 @@ body { caret-color: var(--ember); }
   .experience-thread-point { top: 50%; left: 12px; right: auto; }
   /* Projects note sits by the thread rail on phone. */
   .projects-story-note { left: auto; right: 64px; transform: rotate(-3deg); }
+  /* The whole 641-767 band uses the phone projects layout (fan on top). */
+  .projects-explorer { grid-template-columns: 1fr; }
   /* Phone measure: keep the lede and project copy off the right edge. */
   .hero-copy { max-width: 19rem; }
   .project-preview-info p { max-width: 20.5rem; }
