@@ -1053,6 +1053,11 @@ body { caret-color: var(--ember); }
   .thread-anchor-journey-entry { top: 206px; right: 20px; position: absolute !important; }
   .thread-anchor-journey-mid { top: 300px; left: 50%; position: absolute !important; }
 }
+/* Tablet band: dial labels shrink with the viewport (38px desktop size
+   overflows the narrower left column). */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .project-picker-wheel [role='option'] { font-size: clamp(1.6rem, 3vw, 2.2rem) !important; }
+}
 @media (max-width: 767px) {
   .journey, .projects, .toolkit { position: relative; }
   .thread-anchor {
