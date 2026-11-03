@@ -166,13 +166,18 @@ export default function App() {
             return { x: x + node.offsetWidth / 2, y: y + node.offsetHeight / 2 };
           });
         const d = buildThreadPath(points);
-        setThread({ width: page.clientWidth, height: page.scrollHeight, path: d });
+        // Bail-out re-render: measure() re-runs after every scroll settle, and
+        // re-setting an identical path re-renders the whole tree for nothing.
+        setThread(prev =>
+          prev.path === d && prev.width === page.clientWidth && prev.height === page.scrollHeight
+            ? prev
+            : { width: page.clientWidth, height: page.scrollHeight, path: d });
         const probe = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         probe.setAttribute('d', d);
         const total = probe.getTotalLength();
         const samples = [];
-        for (let i = 0; i <= 800; i++) {
-          const len = (total * i) / 800;
+        for (let i = 0; i <= 400; i++) {
+          const len = (total * i) / 400;
           const pt = probe.getPointAtLength(len);
           samples.push({ x: pt.x, y: pt.y, len });
         }
@@ -197,17 +202,14 @@ export default function App() {
             dot.style.top = `${dateCenter}px`;
             cy = by - dot.offsetTop + dateCenter;
           }
-          // Bisect the path for the exact point at this dot's height — the
-          // curve is too tight near the S-bend for table interpolation.
+          // Interpolate the path's x at this dot's height from the sample
+          // table — getPointAtLength per dot froze the main thread on phones.
           let px = samples[0].x;
           for (let i = 1; i < samples.length; i++) {
             if (samples[i].y < cy) continue;
-            let lo = samples[i - 1].len, hi = samples[i].len;
-            for (let k = 0; k < 14; k++) {
-              const mid = (lo + hi) / 2;
-              if (probe.getPointAtLength(mid).y < cy) lo = mid; else hi = mid;
-            }
-            px = probe.getPointAtLength((lo + hi) / 2).x;
+            const a = samples[i - 1], b = samples[i];
+            const t = b.y === a.y ? 0 : (cy - a.y) / (b.y - a.y);
+            px = a.x + (b.x - a.x) * t;
             break;
           }
           dot.style.transform = `translateY(-50%) translateX(${(px - cx).toFixed(2)}px)`;

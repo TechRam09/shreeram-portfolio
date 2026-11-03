@@ -62,7 +62,7 @@ const MONO_STACK = '"JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, 
 
 const HWF_CSS = `
 .hwf-root {
-  position: relative; width: 100%; overflow: hidden; isolation: isolate;
+  position: relative; width: 100%; height: var(--hwf-h); overflow: hidden; isolation: isolate;
   background: var(--hwf-bg); color: var(--hwf-ink); -webkit-font-smoothing: antialiased;
 }
 .hwf-root canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; max-width: none; }
@@ -91,6 +91,7 @@ const HWF_CSS = `
 }
 .hwf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 720px) {
+  .hwf-root { height: min(var(--hwf-h), 400px); }
   .hwf-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 18px; }
   .hwf-brand { grid-column: 1 / -1; }
 }
@@ -167,11 +168,14 @@ export default function HalftoneWordmarkFooter({
       const face = o.fontWeight + " 100px " + o.fontFamily
       m.font = face
       const word = o.wordmark || " "
-      const fit = hwfFitSize(m.measureText(word).width, w * 1.02)
+      // On phones the word bleeds past both edges and rises above the bottom
+      // edge so it stays readable; on desktop it stays wide and heavily cropped.
+      const phone = w <= 720
+      const fit = hwfFitSize(m.measureText(word).width, w * (phone ? 1.05 : 1.02))
       m.font = o.fontWeight + " " + fit + "px " + o.fontFamily
       const box = m.measureText(word)
       const cap = box.actualBoundingBoxAscent || fit * 0.72
-      const c = Math.max(0, Math.min(0.6, o.crop))
+      const c = phone ? -0.15 : Math.max(0, Math.min(0.6, o.crop))
       m.fillStyle = "#000"
       m.textBaseline = "alphabetic"
       m.fillText(word, (w - box.width) / 2, h + cap * c)
@@ -333,9 +337,11 @@ export default function HalftoneWordmarkFooter({
     draw(performance.now())
     wake()
 
-    root.addEventListener("pointermove", onMove)
-    root.addEventListener("pointerleave", onLeave)
-    root.addEventListener("pointerdown", onDown)
+    // Listen on the canvas, not the root: the .hwf-top links and the rule sit
+    // above it in stacking order, so they shield the dots from their pointers.
+    canvas.addEventListener("pointermove", onMove)
+    canvas.addEventListener("pointerleave", onLeave)
+    canvas.addEventListener("pointerdown", onDown)
     const ro = new ResizeObserver(() => {
       layout()
       wake()
@@ -361,9 +367,9 @@ export default function HalftoneWordmarkFooter({
       cancelAnimationFrame(raf)
       ro.disconnect()
       io.disconnect()
-      root.removeEventListener("pointermove", onMove)
-      root.removeEventListener("pointerleave", onLeave)
-      root.removeEventListener("pointerdown", onDown)
+      canvas.removeEventListener("pointermove", onMove)
+      canvas.removeEventListener("pointerleave", onLeave)
+      canvas.removeEventListener("pointerdown", onDown)
     }
   }, [key])
 
@@ -377,7 +383,7 @@ export default function HalftoneWordmarkFooter({
       className={"hwf-root " + className}
       style={
         {
-          height,
+          "--hwf-h": height,
           "--hwf-bg": colors.background,
           "--hwf-ink": colors.ink,
           "--hwf-mono": monoFamily,
