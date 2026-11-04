@@ -333,6 +333,18 @@ export const StaggeredMenu = ({
   }, [playClose, animateIcon, animateColor, animateText, onMenuClose]);
 
   React.useEffect(() => {
+    if (!open) return undefined;
+    // Lock the page behind the full-screen panel — no background scrolling
+    // and no scrollbar peeking while the menu is up.
+    const html = document.documentElement;
+    const prev = html.style.overflow;
+    html.style.overflow = 'hidden';
+    return () => {
+      html.style.overflow = prev;
+    };
+  }, [open]);
+
+  React.useEffect(() => {
     if (!closeOnClickAway || !open) return;
 
     const handleClickOutside = event => {

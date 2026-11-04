@@ -15,8 +15,6 @@ const KICK = 0.024;
 
 const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-const fontsAreLoaded = () => typeof document !== 'undefined' && (!document.fonts || document.fonts.status === 'loaded');
-
 const waveEase = (t) => 1 - Math.cos(t * Math.PI * 1.5) * Math.pow(1 - t, 1.2);
 
 const getEffect = (effect, em) => {
@@ -78,9 +76,15 @@ const SplitText = ({
 }) => {
   const ref = useRef(null);
   const completedTextRef = useRef(null);
+  // Set when an entrance has begun but not completed — survives the effect
+  // re-run a font swap triggers, so the new split can finish instantly
+  // instead of restarting the animation.
+  const entranceRef = useRef(null);
   const onCompleteRef = useRef(onLetterAnimationComplete);
   const liveRef = useRef({ trigger, hoverEffect, accentColor });
-  const [fontsLoaded, setFontsLoaded] = useState(fontsAreLoaded);
+  // Animate immediately in whatever font is available; when the real face
+  // lands, fontEpoch bumps and the split re-runs (see the onSplit hand-off).
+  const [fontEpoch, setFontEpoch] = useState(0);
   const [ready, setReady] = useState(false);
 
   useIsoLayoutEffect(() => {
@@ -89,25 +93,21 @@ const SplitText = ({
   });
 
   useEffect(() => {
-    if (fontsLoaded) return undefined;
+    if (typeof document === 'undefined' || !document.fonts || document.fonts.status === 'loaded') return undefined;
     let active = true;
     document.fonts.ready.then(() => {
-      if (active) setFontsLoaded(true);
+      if (active) setFontEpoch(epoch => epoch + 1);
     });
     return () => {
       active = false;
     };
-  }, [fontsLoaded]);
+  }, []);
 
   useGSAP(
     () => {
       const el = ref.current;
-      if (!el || !text || !fontsLoaded) return;
+      if (!el || !text) return;
       el.getBoundingClientRect();
-      if (!fontsAreLoaded()) {
-        setFontsLoaded(false);
-        return;
-      }
 
       const finish = () => {
         if (completedTextRef.current === text) return;
@@ -337,6 +337,15 @@ const SplitText = ({
             busy = null;
           }
           if (revealed) return undefined;
+          if (entranceRef.current === text) {
+            // A font swap landing mid-entrance: finish instantly in the real
+            // face rather than blanking or restarting the animation.
+            entranceRef.current = null;
+            gsap.set(pieces, { ...toVars, color: getComputedStyle(el).color });
+            revealed = true;
+            finish();
+            return undefined;
+          }
           intro = reveal(true, {
             scrollTrigger:
               trigger === 'load'
@@ -346,11 +355,13 @@ const SplitText = ({
               revealed = true;
               intro = null;
               busy = null;
+              entranceRef.current = null;
               finish();
               queue();
             }
           });
           busy = intro;
+          entranceRef.current = text;
           return intro;
         }
       });
@@ -396,7 +407,7 @@ const SplitText = ({
         trigger,
         loop,
         loopDelay,
-        fontsLoaded
+        fontEpoch
       ],
       scope: ref,
       revertOnUpdate: true

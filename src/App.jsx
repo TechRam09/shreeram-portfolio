@@ -222,11 +222,15 @@ export default function App() {
     window.addEventListener('resize', measure);
     document.fonts?.ready.then(measure);
     // Entrance animations shift nodes after mount without resizing anything —
-    // re-measure once scrolling settles so the path passes through every node.
+    // re-measure once scrolling settles. The heavy body is scheduled at idle
+    // priority so it never queues behind (or delays) taps like the menu toggle.
     let scrollTimer;
     const onScrollSettled = () => {
       window.clearTimeout(scrollTimer);
-      scrollTimer = window.setTimeout(measure, 700);
+      scrollTimer = window.setTimeout(() => {
+        if (window.requestIdleCallback) window.requestIdleCallback(measure, { timeout: 1500 });
+        else measure();
+      }, 250);
     };
     let progressTicking = false;
     const onScrollProgress = () => {
@@ -388,6 +392,8 @@ export default function App() {
             borderWidth={1}
             background="#15131c"
             dropStyle="rain"
+            gravity={1.35}
+            stagger={0.03}
             font={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14 }}
           />
           <span className="thread-anchor thread-anchor-pile-exit" data-story-node aria-hidden="true" />
