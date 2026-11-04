@@ -392,8 +392,9 @@ export default function App() {
             borderWidth={1}
             background="#15131c"
             dropStyle="rain"
-            gravity={1.35}
-            stagger={0.03}
+            gravity={1.9}
+            bounce={0.26}
+            stagger={0.015}
             replay={false}
             font={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14 }}
           />
