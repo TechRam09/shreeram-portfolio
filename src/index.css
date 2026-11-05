@@ -651,11 +651,13 @@ a:focus-visible {
 .education-line p span { color: #8f8095; }
 .education-score { padding: 4px 6px; background: #14131a; color: var(--ember) !important; font-size: 11px !important; white-space: nowrap; }
 
-.contact { position: relative; overflow: hidden; padding-top: 72px; padding-bottom: 42px; background: #211c29; }
+.contact { position: relative; overflow: hidden; padding-top: 96px; padding-bottom: 68px; background: #211c29; }
 .contact-profile {
   position: absolute;
   z-index: 3;
-  top: 50%;
+  /* Dead-centered on the orbit rings: the rings hang from top:20px, so their
+     center sits at 20px + radius; the card shares that center point. */
+  top: calc(20px + min(42vw, 530px) / 2);
   right: calc(3% + min(42vw, 530px) / 2);
   transform: translate(50%, -50%);
   width: min(340px, 30vw);
