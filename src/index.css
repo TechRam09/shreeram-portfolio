@@ -417,7 +417,7 @@ a:focus-visible {
 }
 
 .hero-content,
-.section-wrap > *:not(.contact-orbit):not(.contact-profile) {
+.section-wrap > *:not(.contact-orbit):not(.contact-profile):not(.contact-card-wrap) {
   position: relative;
   z-index: 3;
 }
@@ -652,18 +652,24 @@ a:focus-visible {
 .education-score { padding: 4px 6px; background: #14131a; color: var(--ember) !important; font-size: 11px !important; white-space: nowrap; }
 
 .contact { position: relative; overflow: hidden; padding-top: 96px; padding-bottom: 68px; background: #211c29; }
-.contact-profile {
+.contact-card-wrap {
   position: absolute;
   z-index: 3;
-  /* Dead-centered on the orbit rings: the rings hang from top:20px, so their
-     center sits at 20px + radius; the card shares that center point. */
-  top: calc(20px + min(42vw, 530px) / 2);
-  right: calc(3% + min(42vw, 530px) / 2);
-  transform: translate(50%, -50%);
+  top: 20px;
+  right: 3%;
+  width: min(42vw, 530px);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.contact-profile {
+  position: relative;
+  z-index: 3;
   width: min(340px, max(34vw, 280px));
   filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.4));
 }
-.contact > :not(.contact-orbit):not(.contact-profile) { position: relative; z-index: 3; }
+.contact > :not(.contact-orbit):not(.contact-profile):not(.contact-card-wrap) { position: relative; z-index: 3; }
 .contact h2 { max-width: 820px; font-size: clamp(62px, 9vw, 124px); }
 .contact > p { max-width: 460px; margin: 27px 0 0; color: #c3b7c8; font-size: 15px; line-height: 1.7; }
 .contact-cta {
@@ -723,7 +729,7 @@ a:focus-visible {
 }
 .pc-send:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.08); }
 .contact-cta:hover { gap: 28px; background: #ff8b6e; }
-.contact-orbit { position: absolute; z-index: 0; top: 20px; right: 3%; width: min(42vw, 530px); aspect-ratio: 1; border: 1px solid rgba(188, 144, 195, 0.12); border-radius: 50%; }
+.contact-orbit { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; border: 1px solid rgba(188, 144, 195, 0.12); border-radius: 50%; pointer-events: none; }
 .contact-orbit::before, .contact-orbit::after { position: absolute; inset: 12%; border: 1px solid rgba(188, 144, 195, 0.1); border-radius: 50%; content: ''; }
 .contact-orbit::after { inset: 27%; }
 .contact-orbit span { position: absolute; top: 50%; left: -6px; width: 11px; height: 11px; border-radius: 50%; background: var(--ember); box-shadow: 0 0 25px rgba(250, 118, 86, 0.7); }
@@ -952,7 +958,6 @@ body { caret-color: var(--ember); }
   .contact { padding-top: 96px; padding-bottom: 22px; }
   .contact h2 { font-size: clamp(56px, 14vw, 84px); }
   .contact > p { max-width: 360px; font-size: 14px; }
-  .contact-orbit { top: 0; right: -24%; width: 76vw; opacity: 0.6; }
   .footer-bottom { flex-wrap: wrap; row-gap: 17px; margin-top: 88px; }
   .footer-note { order: 3; width: 100%; }
 }
@@ -1013,14 +1018,38 @@ body { caret-color: var(--ember); }
 .contact-profile button { padding-inline: 11px; gap: 4px; }
 .contact-profile .pc-handle { font-size: 13px; }
 
-/* Contact profile card — stacks into flow on mobile, sized to sit inside the
-   orbit rings (76vw wide) with the ring line visible around it */
 @media (max-width: 767px) {
-  .contact-profile {
-    position: static;
+  .contact-profile .pc-handle {
+    font-size: 11px;
+    overflow: visible !important;
+    text-overflow: unset !important;
+    white-space: normal !important;
+  }
+}
+
+/* Contact profile card & orbit wrapper on mobile — centers the card
+   perfectly inside the orbit rings */
+@media (max-width: 767px) {
+  .contact-card-wrap {
+    position: relative;
+    top: auto;
+    right: auto;
     transform: none;
-    width: min(280px, calc(100vw - 52px));
-    margin: 40px auto 44px;
+    width: min(88vw, 360px);
+    aspect-ratio: 1;
+    margin: 36px auto 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .contact-profile {
+    position: relative;
+    z-index: 3;
+    top: auto;
+    right: auto;
+    transform: none;
+    width: min(250px, calc(100vw - 56px));
+    margin: 0;
   }
 }
 
@@ -1119,19 +1148,32 @@ body { caret-color: var(--ember); }
     backdrop-filter: blur(14px) saturate(140%);
     border-bottom: 1px solid rgba(243, 238, 232, 0.08);
   }
-  /* Contact rings re-centered behind the profile card on phone. */
+  /* Contact rings: orbit fills the card wrap and is centered behind the card */
   .contact-orbit {
-    top: auto;
-    right: 50%;
-    bottom: 44px;
-    transform: translateX(50%);
-    width: min(94vw, 430px);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    pointer-events: none;
+    opacity: 0.85;
   }
   /* Thread route: sweep right across the section top, curve down the right
      side, and dive behind the card at its top-right corner (user trace). */
   .contact { position: relative; overflow-x: clip; }
   .thread-anchor-contact-arc { top: 44px; right: 30px; position: absolute !important; }
-  .thread-anchor-contact-end { top: 461px; right: 36%; position: absolute !important; }
+  .contact-profile .thread-anchor-contact-end {
+    display: block;
+    position: absolute !important;
+    top: 36px;
+    right: 24px;
+    width: 2px;
+    height: 2px;
+  }
   /* Option wheel on phone: horizontal fan of vertical-text labels */
   .project-picker-wheel [role='option'] {
     writing-mode: vertical-rl !important;

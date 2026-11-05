@@ -404,24 +404,26 @@ export default function App() {
       </section>
 
       <footer className="contact section-wrap" id="contact" data-thread-section>
-        <div className="contact-orbit" aria-hidden="true" data-story-node><span /><span /><span /></div>
         <span className="thread-anchor thread-anchor-contact-arc" data-story-node aria-hidden="true" />
         <h2><span className="hero-title-line"><SplitText text="Need a website" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="or web app?" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2>
         <p>Tell me what you have in mind. We can talk through the design, development, scope, and next steps.</p>
         <a className="contact-cta" href="#contact">Discuss a project <ArrowUpRight size={19} aria-hidden="true" /></a>
-        <span className="thread-anchor thread-anchor-contact-end" data-story-node aria-hidden="true" />
-        <div className="contact-profile">
-          <ProfileCard
-            avatarUrl="/portrait-cutout.png"
-            name="Shreeram N S"
-            title="Java Full-Stack Developer"
-            handle="TechRam09"
-            status="Online"
-            flipSignal={flipSignal}
-            contactText="Say hello"
-            theme="dark"
-            backdropColor="#241d31"
-          />
+        <div className="contact-card-wrap">
+          <div className="contact-orbit" aria-hidden="true" data-story-node><span /><span /><span /></div>
+          <div className="contact-profile">
+            <span className="thread-anchor thread-anchor-contact-end" data-story-node aria-hidden="true" />
+            <ProfileCard
+              avatarUrl="/portrait-cutout.png"
+              name="Shreeram N S"
+              title="Java Full-Stack Developer"
+              handle="TechRam09"
+              status="Online"
+              flipSignal={flipSignal}
+              contactText="Say hello"
+              theme="dark"
+              backdropColor="#241d31"
+            />
+          </div>
         </div>
       </footer>
 
