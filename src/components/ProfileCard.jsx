@@ -171,7 +171,7 @@ const AVATAR =
 const AVATAR_IMAGE = 'block h-full w-full object-cover object-top';
 const META = 'flex min-w-0 flex-1 flex-col gap-[3px]';
 const HANDLE =
-  'overflow-hidden text-ellipsis whitespace-nowrap text-[14px] font-semibold leading-[1.25] text-[var(--pc-ink)]';
+  'pc-handle overflow-hidden text-ellipsis whitespace-nowrap text-[14px] font-semibold leading-[1.25] text-[var(--pc-ink)]';
 const STATUS =
   "flex items-center gap-1.5 whitespace-nowrap text-[12.5px] leading-[1.25] text-[var(--pc-muted)] before:h-1.5 before:w-1.5 before:flex-none before:rounded-full before:bg-[var(--pc-status)] before:content-['']";
 const CONTACT =

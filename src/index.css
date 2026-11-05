@@ -660,7 +660,7 @@ a:focus-visible {
   top: calc(20px + min(42vw, 530px) / 2);
   right: calc(3% + min(42vw, 530px) / 2);
   transform: translate(50%, -50%);
-  width: min(340px, 30vw);
+  width: min(340px, max(34vw, 280px));
   filter: drop-shadow(0 24px 48px rgba(0, 0, 0, 0.4));
 }
 .contact > :not(.contact-orbit):not(.contact-profile) { position: relative; z-index: 3; }
@@ -1008,13 +1008,19 @@ body { caret-color: var(--ember); }
   .sm-scope .staggered-menu-header.staggered-menu-header { padding-top: 2.05em; }
 }
 
-/* Contact profile card — stacks into flow on mobile */
+/* Tighten the card footer row so "@TechRam09" never truncates when the card
+   is narrow (tablet band shrinks it to ~230px) */
+.contact-profile button { padding-inline: 11px; gap: 4px; }
+.contact-profile .pc-handle { font-size: 13px; }
+
+/* Contact profile card — stacks into flow on mobile, sized to sit inside the
+   orbit rings (76vw wide) with the ring line visible around it */
 @media (max-width: 767px) {
   .contact-profile {
     position: static;
     transform: none;
-    width: min(340px, calc(100% - 44px));
-    margin: 36px auto 36px;
+    width: min(280px, calc(100vw - 52px));
+    margin: 40px auto 44px;
   }
 }
 
