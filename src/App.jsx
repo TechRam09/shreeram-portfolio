@@ -320,8 +320,8 @@ export default function App() {
         <span className="hero-story-note hero-story-note-start" aria-hidden="true">started with curiosity</span>
         <div className="hero-content">
           <h1 id="hero-title">
-            <span className="hero-title-line"><SplitText text="I started with" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={14} duration={0.6} effect="rise" trigger="view" hoverEffect="lift" /></span>
-            <span className="hero-title-line"><SplitText text="curiosity." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={14} duration={0.6} effect="rise" trigger="view" hoverEffect="lift" /></span>
+            <span className="hero-title-line"><SplitText text="I started with" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={14} duration={0.6} effect="rise" trigger="load" hoverEffect="lift" /></span>
+            <span className="hero-title-line"><SplitText text="curiosity." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={14} duration={0.6} effect="rise" trigger="load" hoverEffect="lift" /></span>
           </h1>
           <div className="hero-lower">
             <p className="hero-copy">In 2021, curiosity led me into code. Since then, I’ve followed it through a Computer Science degree and two internships to Java full-stack engineering at Bounteous, where I currently work with Morgan Stanley.</p>
