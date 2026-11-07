@@ -1,15 +1,16 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowDown, ArrowUpRight, Braces, Code2, MoveUpRight, Sprout } from 'lucide-react';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PillNav from './components/PillNav';
-import OptionWheel from './components/OptionWheel';
 import StaggeredMenu from './components/StaggeredMenu';
 import AeroShards from './components/AeroShards';
-import PhysicsTagPile from './components/PhysicsTagPile';
 import ProfileCard from './components/ProfileCard';
-import HalftoneWordmarkFooter from './components/HalftoneWordmarkFooter';
 import { buildThreadPath, progressFractionAt } from './lib/thread';
 import SplitText from './components/SplitText';
+
+const OptionWheel = React.lazy(() => import('./components/OptionWheel'));
+const PhysicsTagPile = React.lazy(() => import('./components/PhysicsTagPile'));
+const HalftoneWordmarkFooter = React.lazy(() => import('./components/HalftoneWordmarkFooter'));
 
 const navigation = [
   { label: 'Story', href: '#story' },
@@ -261,7 +262,11 @@ export default function App() {
     window.addEventListener('scroll', onScrollSettled, { passive: true });
     window.addEventListener('scroll', onScrollProgress, { passive: true });
     window.addEventListener('thread-remeasure', measure);
-    measure();
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(measure, { timeout: 200 });
+    } else {
+      window.setTimeout(measure, 50);
+    }
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
@@ -355,20 +360,22 @@ export default function App() {
         <div className="projects-explorer">
           <div className="project-picker" role="group" aria-label="Choose a project to preview">
             <div className="project-picker-wheel">
-              <OptionWheel
-                items={projects.map(project => project.name)}
-                links={projects.map(project => project.href)}
-                defaultSelected={activeProjectIndex}
-                onChange={setActiveProjectIndex}
-                textColor="#9f91a4"
-                activeColor="#f0ece8"
-                fontSize={2.4}
-                spacing={2.2}
-                tilt={16}
-                curve={1}
-                inset={18}
-                loop
-              />
+              <Suspense fallback={<div className="h-full w-full" />}>
+                <OptionWheel
+                  items={projects.map(project => project.name)}
+                  links={projects.map(project => project.href)}
+                  defaultSelected={activeProjectIndex}
+                  onChange={setActiveProjectIndex}
+                  textColor="#9f91a4"
+                  activeColor="#f0ece8"
+                  fontSize={2.4}
+                  spacing={2.2}
+                  tilt={16}
+                  curve={1}
+                  inset={18}
+                  loop
+                />
+              </Suspense>
             </div>
             <span className="project-picker-hint">Scroll, drag, or use arrow keys to pick a project.</span>
           </div>
@@ -400,21 +407,23 @@ export default function App() {
         <div className="toolkit-top"><div className="section-heading"><h2 id="toolkit-title"><span className="hero-title-line"><SplitText text="Tools for turning" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="questions into things." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2><p>A growing set of tools I reach for across the stack.</p></div><div className="toolkit-mark" aria-hidden="true" data-story-node><Code2 size={36} strokeWidth={1.15} /></div><span className="section-story-note toolkit-story-note">still adding to the toolbox</span></div>
         <div className="skill-pile">
           <span className="thread-anchor thread-anchor-pile-entry" data-story-node aria-hidden="true" />
-          <PhysicsTagPile
-            tags={skills.map(label => ({ label, featured: featuredSkills.includes(label) }))}
-            colors={['#332a4d', '#3a3155', '#2b2340', '#413860']}
-            featuredColor="#fa8265"
-            textColor="#f0ece8"
-            borderColor="rgba(243, 238, 232, 0.16)"
-            borderWidth={1}
-            background="#15131c"
-            dropStyle="rain"
-            gravity={1.9}
-            bounce={0.26}
-            stagger={0.015}
-            replay={false}
-            font={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14 }}
-          />
+          <Suspense fallback={<div className="h-full w-full" />}>
+            <PhysicsTagPile
+              tags={skills.map(label => ({ label, featured: featuredSkills.includes(label) }))}
+              colors={['#332a4d', '#3a3155', '#2b2340', '#413860']}
+              featuredColor="#fa8265"
+              textColor="#f0ece8"
+              borderColor="rgba(243, 238, 232, 0.16)"
+              borderWidth={1}
+              background="#15131c"
+              dropStyle="rain"
+              gravity={1.9}
+              bounce={0.26}
+              stagger={0.015}
+              replay={false}
+              font={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14 }}
+            />
+          </Suspense>
           <span className="thread-anchor thread-anchor-pile-exit" data-story-node aria-hidden="true" />
         </div>
         <div className="education-line"><span>EDUCATION</span><p><strong>B.E. Computer Science & Engineering</strong><br />Vidya Vikas Institute of Engineering and Technology <span>· 2025</span></p><span className="thread-anchor thread-anchor-education-entry" data-story-node aria-hidden="true" /><span className="thread-anchor thread-anchor-toolkit-left" data-story-node aria-hidden="true" /><span className="thread-anchor thread-anchor-education-exit" data-story-node aria-hidden="true" /></div>
@@ -444,18 +453,20 @@ export default function App() {
         </div>
       </footer>
 
-      <HalftoneWordmarkFooter
-        wordmark="shreeram"
-        label="Shreeram N S"
-        meta="Built with curiosity · © 2026"
-        columns={[
-          { title: 'Pages', links: [{ label: 'Story', href: '#story' }, { label: 'Projects', href: '#projects' }, { label: 'Experience', href: '#experience' }] },
-          { title: 'Elsewhere', links: [{ label: 'GitHub', href: 'https://github.com/TechRam09' }, { label: 'LinkedIn', href: 'https://www.linkedin.com/in/shreeram-ns/' }] },
-          { title: 'Contact', links: [{ label: 'Say hello', href: '#contact' }] }
-        ]}
-        palette={{ background: '#191620', ink: '#f0ece8', warm: '#fa8265' }}
-        height="440px"
-      />
+      <Suspense fallback={<footer className="h-[440px] bg-[#191620]" />}>
+        <HalftoneWordmarkFooter
+          wordmark="shreeram"
+          label="Shreeram N S"
+          meta="Built with curiosity · © 2026"
+          columns={[
+            { title: 'Pages', links: [{ label: 'Story', href: '#story' }, { label: 'Projects', href: '#projects' }, { label: 'Experience', href: '#experience' }] },
+            { title: 'Elsewhere', links: [{ label: 'GitHub', href: 'https://github.com/TechRam09' }, { label: 'LinkedIn', href: 'https://www.linkedin.com/in/shreeram-ns/' }] },
+            { title: 'Contact', links: [{ label: 'Say hello', href: '#contact' }] }
+          ]}
+          palette={{ background: '#191620', ink: '#f0ece8', warm: '#fa8265' }}
+          height="440px"
+        />
+      </Suspense>
     </main>
   );
 }
