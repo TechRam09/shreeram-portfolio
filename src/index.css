@@ -621,7 +621,7 @@ a:focus-visible {
 .experience { display: grid; grid-template-columns: 0.78fr 1.22fr; gap: clamp(54px, 10vw, 160px); padding-top: 145px; padding-bottom: 152px; background: #191620; }
 .experience-list { position: relative; padding-top: 5px; }
 .experience-item { position: relative; display: grid; grid-template-columns: 145px minmax(0, 1fr); align-items: start; gap: 22px; padding: 27px 0; border-bottom: 1px solid rgba(243, 238, 232, 0.12); }
-.experience-thread-point { position: absolute; z-index: 3; top: 50%; left: calc(-1 * clamp(27px, 5vw, 80px) - 3px); width: 6px; height: 6px; border: 1px solid rgba(207, 190, 255, 0.88); border-radius: 50%; background: #191620; box-shadow: 0 0 9px rgba(171, 155, 241, 0.48); transform: translateY(-50%); }
+.experience-thread-point { position: absolute; z-index: 3; top: 50%; left: calc(-1 * clamp(27px, 5vw, 80px) - 3px); width: 6px; height: 6px; border: 1px solid rgba(207, 190, 255, 0.88); border-radius: 50%; background: #191620; box-shadow: 0 0 9px rgba(171, 155, 241, 0.48); transform: translateY(-50%); will-change: transform; }
 .experience-date, .experience-type { padding-top: 5px; color: #aa9bad; font-size: 8px; line-height: 1.6; }
 .experience-item h3 { margin: 0 0 7px; color: var(--paper); font-family: var(--font-display); font-size: 19px; font-weight: 500; letter-spacing: -0.025em; }
 .experience-item p { margin: 0; color: #b9afbf; font-size: 13px; }
@@ -709,6 +709,22 @@ a:focus-visible {
 }
 @media (prefers-reduced-motion: reduce) {
   .contact-cta, .contact-cta::after, .action-primary, .action-primary::after, .action-secondary, .action-secondary::after, .pc-send, .pc-send::after { animation: none; }
+}
+
+/* Pause offscreen continuous animations when their section is out of the viewport.
+   Animations resume instantly when scrolled into view without removing any effects. */
+.is-offscreen .scan-ring,
+.is-offscreen .scan-bar,
+.is-offscreen .coordinate-line,
+.is-offscreen .contact-cta,
+.is-offscreen .contact-cta::after,
+.is-offscreen .action-primary,
+.is-offscreen .action-primary::after,
+.is-offscreen .action-secondary,
+.is-offscreen .action-secondary::after,
+.is-offscreen .pc-send,
+.is-offscreen .pc-send::after {
+  animation-play-state: paused !important;
 }
 /* Send-message button carries the same metallic treatment as the other CTAs. */
 .pc-send {

@@ -1945,11 +1945,12 @@ export default function AeroShards({
       };
 
       const tick = now => {
-        raf = requestAnimationFrame(tick);
         if (!state.visible || document.hidden) {
-          state.last = now;
+          state.last = 0;
+          raf = 0;
           return;
         }
+        raf = requestAnimationFrame(tick);
         const s = settingsRef.current;
         const dt = state.last ? Math.min((now - state.last) / 1000, 0.05) : 0;
         state.last = now;
@@ -2131,12 +2132,28 @@ export default function AeroShards({
         document.documentElement.removeEventListener('pointerleave', onLeave);
       });
 
+      const wake = () => {
+        if (!raf && state.visible && !document.hidden && !disposed) {
+          state.last = 0;
+          raf = requestAnimationFrame(tick);
+        }
+      };
+
       const visibility = new IntersectionObserver(entries => {
         state.visible = entries.some(entry => entry.isIntersecting);
-      });
+        if (state.visible) wake();
+      }, { threshold: 0.05 });
       visibility.observe(container);
-      cleanups.push(() => visibility.disconnect());
-      raf = requestAnimationFrame(tick);
+
+      const onVisibilityChange = () => {
+        if (!document.hidden && state.visible) wake();
+      };
+      document.addEventListener('visibilitychange', onVisibilityChange);
+      cleanups.push(() => {
+        visibility.disconnect();
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+      });
+      wake();
     };
 
     start().catch(fail);

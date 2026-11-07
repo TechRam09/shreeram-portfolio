@@ -126,7 +126,24 @@ export default function App() {
       if (visible) setActiveSection(`#${visible.target.id}`);
     }, { rootMargin: '-25% 0px -55% 0px', threshold: [0, 0.2, 0.5] });
     sections.forEach(section => observer.observe(section));
-    return () => observer.disconnect();
+
+    // Observe all major sections to pause offscreen CSS animations when out of view
+    const animSections = document.querySelectorAll('[data-thread-section]');
+    const animObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('is-offscreen');
+        } else {
+          entry.target.classList.add('is-offscreen');
+        }
+      });
+    }, { rootMargin: '100px 0px 100px 0px', threshold: 0.01 });
+    animSections.forEach(section => animObserver.observe(section));
+
+    return () => {
+      observer.disconnect();
+      animObserver.disconnect();
+    };
   }, []);
 
   useLayoutEffect(() => {
