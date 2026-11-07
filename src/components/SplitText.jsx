@@ -85,7 +85,7 @@ const SplitText = ({
   // Animate immediately in whatever font is available; when the real face
   // lands, fontEpoch bumps and the split re-runs (see the onSplit hand-off).
   const [fontEpoch, setFontEpoch] = useState(0);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(true);
 
   useIsoLayoutEffect(() => {
     onCompleteRef.current = onLetterAnimationComplete;
