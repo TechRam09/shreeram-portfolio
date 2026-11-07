@@ -312,7 +312,7 @@ export default function App() {
 
       <section className="hero" id="story" aria-labelledby="hero-title" data-thread-section>
         <div className="hero-shader" aria-hidden="true">
-          <AeroShards shardColor="#ab9bf1" accentColor="#7f6fd1" markers="none" pulseOnClick={false} holdToGather={false} mouseStrength={0.4} paused={prefersReducedMotion} />
+          <AeroShards intro={false} shardColor="#ab9bf1" accentColor="#7f6fd1" markers="none" pulseOnClick={false} holdToGather={false} mouseStrength={0.4} paused={prefersReducedMotion} />
         </div>
         <div className="hero-shader-wash" aria-hidden="true" />
         <span className="hero-flow-anchor hero-flow-anchor-start" data-story-node aria-hidden="true" />
