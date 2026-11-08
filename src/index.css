@@ -254,7 +254,7 @@ a:focus-visible {
   white-space: nowrap;
 }
 
-.hero-story-note-start { top: 19%; right: clamp(32px, 9vw, 130px); transform: rotate(-6deg); }
+.hero-story-note-start { top: 19%; right: clamp(32px, 12vw, 180px); transform: rotate(-6deg); }
 
 .portfolio-thread {
   position: absolute;
@@ -845,7 +845,7 @@ body { caret-color: var(--ember); }
   .hero-content {
     width: calc(100% - 40px);
     justify-content: center;
-    padding: 104px 0 62px;
+    padding: 86px 0 52px;
   }
 
   .hero h1 {
@@ -855,23 +855,41 @@ body { caret-color: var(--ember); }
     line-height: 0.94;
   }
 
+  .hero-actions {
+    gap: 18px;
+    margin-top: 24px;
+  }
+
   .hero-story-note { max-width: min(185px, 45vw); font-size: 19px; white-space: normal; }
-  .hero-story-note-start { top: 19%; right: 18px; }
+
+  .hero-flow-anchor-start {
+    top: auto;
+    bottom: 90px;
+    right: 36px;
+  }
+
+  .hero-flow-anchor-end {
+    top: auto;
+    bottom: 10px;
+    right: 36px;
+  }
+
+  .hero-story-note-start {
+    top: auto;
+    bottom: 100px;
+    right: 24px;
+    transform: rotate(-3deg);
+  }
 
   .hero-lower {
     width: min(100%, 510px);
-    margin-top: 20px;
+    margin-top: 18px;
     margin-left: 0;
   }
 
   .hero-copy {
     font-size: 15px;
     line-height: 1.62;
-  }
-
-  .hero-actions {
-    gap: 18px;
-    margin-top: 24px;
   }
 
   .action-primary {
@@ -904,6 +922,7 @@ body { caret-color: var(--ember); }
 @media (max-width: 380px) {
   .hero-content {
     width: calc(100% - 32px);
+    padding: 82px 0 52px;
   }
 
   .site-header { padding-right: 16px; padding-left: 16px; }
@@ -925,6 +944,7 @@ body { caret-color: var(--ember); }
   .hero-coordinate { right: auto; left: 0; bottom: 24px; font-size: 8px; }
   .section-wrap { padding-right: 22px; padding-left: 22px; }
   .journey, .experience { display: block; padding-top: 94px; padding-bottom: 98px; }
+  .journey .section-heading { max-width: min(100% - 32px, 320px); }
   .journey-note { margin-top: 30px; }
   .chapter-list { gap: 27px; margin-top: 48px; padding: 0; }
   .chapter { min-height: 130px; grid-template-columns: 40px 1fr; gap: 19px; }
@@ -1052,7 +1072,7 @@ body { caret-color: var(--ember); }
     right: auto;
     transform: none;
     width: min(88vw, 360px);
-    aspect-ratio: 1;
+    aspect-ratio: auto;
     margin: 36px auto 28px;
     display: flex;
     align-items: center;
@@ -1064,8 +1084,18 @@ body { caret-color: var(--ember); }
     top: auto;
     right: auto;
     transform: none;
-    width: min(250px, calc(100vw - 56px));
+    width: min(290px, calc(100vw - 32px));
     margin: 0;
+  }
+  .contact-profile .pc-back {
+    padding: 16px;
+  }
+  .contact-profile .pc-back textarea {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  .contact-profile .pc-back .pc-send {
+    padding-block: 9px;
   }
 }
 
@@ -1101,9 +1131,9 @@ body { caret-color: var(--ember); }
 /* Journey (phone + tablet): hold the right rail past the heading before the
    sweep down to the chapters, so the thread never crosses the text. */
 @media (max-width: 1024px) {
-  .journey { position: relative; }
-  .thread-anchor-journey-entry { top: 206px; right: 20px; position: absolute !important; }
-  .thread-anchor-journey-mid { top: 300px; left: 50%; position: absolute !important; }
+  .journey-intro { position: relative; }
+  .thread-anchor-journey-entry { bottom: -18px; right: 20px; position: absolute !important; }
+  .thread-anchor-journey-mid { bottom: -58px; left: 50%; position: absolute !important; }
 }
 /* Tablet band: dial labels shrink with the viewport (38px desktop size
    overflows the narrower left column). The clamp floor also drops so the
@@ -1220,4 +1250,14 @@ body { caret-color: var(--ember); }
   /* Physics pile on phone: room for the full stack + smaller chips */
   .skill-pile { height: 200px; max-width: 100%; }
   .skill-pile div { font-size: 10px !important; padding: 5px 9px !important; }
+}
+
+@media screen and (max-width: 350px) {
+  .hero-story-note-start {
+    right: 36px;
+    max-width: min(150px, 45vw);
+    text-align: center;
+    white-space: normal;
+    transform: translateX(50%) rotate(-3deg);
+  }
 }

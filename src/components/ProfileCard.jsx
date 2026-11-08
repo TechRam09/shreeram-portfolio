@@ -181,7 +181,7 @@ const RIM = `${LAYER} [box-shadow:inset_0_0_0_1px_var(--pc-frame-edge),inset_0_1
 const FLIP = 'relative [transform-style:preserve-3d]';
 const FRONT = 'pc-front relative [transform-style:preserve-3d] [backface-visibility:hidden] [-webkit-backface-visibility:hidden]';
 const BACK =
-  'absolute inset-0 flex flex-col overflow-hidden rounded-[calc(var(--pc-radius)+10px)] [background:var(--pc-backdrop)] p-6 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)]';
+  'pc-back absolute inset-0 flex flex-col overflow-hidden rounded-[calc(var(--pc-radius)+10px)] [background:var(--pc-backdrop)] p-6 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)]';
 const BACK_NOTE = "font-['Caveat',cursive] text-[1.4rem] leading-[1.2] text-[#c4b7fa]";
 const BACK_CLOSE =
   'absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-[rgba(243,238,232,0.22)] text-[0.8rem] text-[#f0ece8] transition hover:border-[#fa8265] hover:text-[#fa8265]';

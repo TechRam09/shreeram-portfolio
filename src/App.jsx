@@ -349,11 +349,11 @@ export default function App() {
       </section>
 
       <section className="journey section-wrap" aria-labelledby="journey-title" data-thread-section>
-        <span className="thread-anchor thread-anchor-journey-entry" data-story-node aria-hidden="true" />
-        <span className="thread-anchor thread-anchor-journey-mid" data-story-node aria-hidden="true" />
         <div className="journey-intro">
           <div className="section-heading"><h2 id="journey-title"><span className="hero-title-line"><SplitText text="A question turned" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span><span className="hero-title-line"><SplitText text="into a direction." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={24} duration={0.72} effect="rise" trigger="view" hoverEffect="lift" /></span></h2><p>The path so far, one chapter at a time.</p></div>
           <div className="journey-note"><Braces size={19} aria-hidden="true" /><span>Still curious.<br />Still building.</span></div>
+          <span className="thread-anchor thread-anchor-journey-entry" data-story-node aria-hidden="true" />
+          <span className="thread-anchor thread-anchor-journey-mid" data-story-node aria-hidden="true" />
         </div>
         <div className="chapter-list">
           {chapters.map((chapter, index) => (
