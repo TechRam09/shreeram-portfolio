@@ -5,6 +5,7 @@ import PillNav from './components/PillNav';
 import StaggeredMenu from './components/StaggeredMenu';
 import AeroShards from './components/AeroShards';
 import ProfileCard from './components/ProfileCard';
+import SplashScreen from './components/SplashScreen';
 import { buildThreadPath, progressFractionAt } from './lib/thread';
 import SplitText from './components/SplitText';
 
@@ -85,6 +86,17 @@ export default function App() {
   const [thread, setThread] = useState({ width: 0, height: 0, path: '' });
   const [isMobileNav, setIsMobileNav] = useState(() => window.matchMedia('(max-width: 767px)').matches);
   const [flipSignal, setFlipSignal] = useState(0);
+  const [showSplash, setShowSplash] = useState(true);
+  const [isAssetsReady, setIsAssetsReady] = useState(false);
+
+  useEffect(() => {
+    // Ensure all critical web fonts and page resources are completely ready
+    if (document.fonts) {
+      document.fonts.ready.then(() => setIsAssetsReady(true)).catch(() => setIsAssetsReady(true));
+    } else {
+      setIsAssetsReady(true);
+    }
+  }, []);
   const progressRef = useRef(null);
   const arcRef = useRef(null);
   const updateThreadProgressRef = useRef(null);
@@ -279,7 +291,9 @@ export default function App() {
   }, []);
 
   return (
-    <main className="portfolio-shell" ref={pageRef}>
+    <>
+      {showSplash && <SplashScreen isReady={isAssetsReady} onComplete={() => setShowSplash(false)} />}
+      <main className="portfolio-shell" ref={pageRef}>
       {thread.path && <svg className="portfolio-thread" viewBox={`0 0 ${thread.width} ${thread.height}`} preserveAspectRatio="none" aria-hidden="true"><path className="portfolio-thread-track" d={thread.path} /><path ref={progressRef} className="portfolio-thread-progress" d={thread.path} pathLength="1" style={{ strokeDasharray: 1, strokeDashoffset: prefersReducedMotion ? 0 : 1 }} /></svg>}
       {isMobileNav && (
         <StaggeredMenu
@@ -320,8 +334,8 @@ export default function App() {
         <span className="hero-story-note hero-story-note-start" aria-hidden="true">started with curiosity</span>
         <div className="hero-content">
           <h1 id="hero-title">
-            <span className="hero-title-line"><SplitText text="I started with" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={14} duration={0.6} effect="rise" trigger="load" hoverEffect="lift" /></span>
-            <span className="hero-title-line"><SplitText text="curiosity." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={14} duration={0.6} effect="rise" trigger="load" hoverEffect="lift" /></span>
+            <span className="hero-title-line"><SplitText text="I started with" className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={14} duration={0.6} effect="rise" trigger={showSplash ? 'view' : 'load'} hoverEffect="lift" /></span>
+            <span className="hero-title-line"><SplitText text="curiosity." className="hero-title-split" textAlign="left" tag="span" splitType="chars" delay={14} duration={0.6} effect="rise" trigger={showSplash ? 'view' : 'load'} hoverEffect="lift" /></span>
           </h1>
           <div className="hero-lower">
             <p className="hero-copy">In 2021, curiosity led me into code. Since then, I’ve followed it through a Computer Science degree and two internships to Java full-stack engineering at Bounteous, where I currently work with Morgan Stanley.</p>
@@ -468,5 +482,6 @@ export default function App() {
         />
       </Suspense>
     </main>
+    </>
   );
 }
